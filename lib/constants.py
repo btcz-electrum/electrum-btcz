@@ -29,10 +29,12 @@ import json
 
 def read_json(filename, default):
     path = os.path.join(os.path.dirname(__file__), filename)
+    print("Checkpoints at: " + path)
     try:
         with open(path, 'r') as f:
             r = json.loads(f.read())
     except:
+        print("GOT EXCEPTION!")
         r = default
     return r
 
@@ -43,9 +45,10 @@ class BitcoinMainnet:
     WIF_PREFIX = 0x80
     ADDRTYPE_P2PKH = bytes.fromhex('1CB8')
     ADDRTYPE_P2SH = bytes.fromhex('1CBD')
-    GENESIS = "00040fe8ec8471911baa1db1266ea15dd06b4a8a5c453883c000b031973dce08"
-    DEFAULT_PORTS = {'t': '50021', 's': '50022'}
+    GENESIS = "f499ee3d498b4298ac6a64205b8addb7c43197e2a660229be65db8a4534d75c1"
+    DEFAULT_PORTS = {'t': '50001', 's': '50002'}
     DEFAULT_SERVERS = read_json('servers.json', {})
+    # The format is [hash, target, [height, serialized_header]]
     CHECKPOINTS = read_json('checkpoints.json', [])
 
     XPRV_HEADERS = {

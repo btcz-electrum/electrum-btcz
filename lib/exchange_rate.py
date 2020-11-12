@@ -41,12 +41,12 @@ class ExchangeBase(PrintError):
     def get_json(self, site, get_string):
         # APIs must have https
         url = ''.join(['https://', site, get_string])
-        response = requests.request('GET', url, headers={'User-Agent' : 'Electrum-Zcash'}, timeout=10)
+        response = requests.request('GET', url, headers={'User-Agent' : 'Electrum-BitcoinZ'}, timeout=10)
         return response.json()
 
     def get_csv(self, site, get_string):
         url = ''.join(['https://', site, get_string])
-        response = requests.request('GET', url, headers={'User-Agent' : 'Electrum-Zcash'})
+        response = requests.request('GET', url, headers={'User-Agent' : 'Electrum-BitcoinZ'})
         reader = csv.DictReader(response.content.decode().split('\n'))
         return list(reader)
 
@@ -174,6 +174,40 @@ class CoinMarketCap(ExchangeBase):
         return quote_currencies
 
 
+class CoinCap(ExchangeBase):
+    def get_rates(self, ccy):
+        json = self.get_json('api.coincap.io', '/v2/assets/bitcoinz/')
+        return {'USD': Decimal(json['data']['priceUsd'])}
+
+    def history_ccys(self):
+        return ['USD']
+
+    def request_history(self, ccy):
+        # Currently 2000 days is the maximum in 1 API call
+        # (and history starts on 2017-03-23)
+        history = self.get_json('api.coincap.io',
+                                '/v2/assets/bitcoinz/history?interval=d1&limit=2000')
+        return dict([(datetime.utcfromtimestamp(h['time']/1000).strftime('%Y-%m-%d'), h['priceUsd'])
+                     for h in history['data']])
+
+class CoinGecko(ExchangeBase):
+    def get_rates(self, ccy):
+        json = self.get_json('api.coingecko.com', '/api/v3/coins/bitcoinz')
+        return dict([(ccy.upper(), Decimal(d))
+                     for ccy, d in json['market_data']['current_price'].items()])
+
+    def history_ccys(self):
+        # CoinGecko seems to have historical data for all ccys it supports
+        return CURRENCIES[self.name()]
+
+    async def request_history(self, ccy):
+        history = self.get_json('api.coingecko.com',
+                                '/api/v3/coins/bitcoinz/market_chart?vs_currency=%s&days=max' % ccy)
+
+        return dict([(datetime.utcfromtimestamp(h[0]/1000).strftime('%Y-%m-%d'), h[1])
+                     for h in history['prices']])
+
+
 def dictinvert(d):
     inv = {}
     for k, vlist in d.items():
@@ -246,7 +280,7 @@ class FxThread(ThreadJob):
         return d.get(ccy, [])
 
     def ccy_amount_str(self, amount, commas):
-        prec = CCY_PRECISIONS.get(self.ccy, 2)
+        prec = CCY_PRECISIONS.get(self.ccy, 8)
         fmt_str = "{:%s.%df}" % ("," if commas else "", max(0, prec))
         try:
             rounded_amount = round(amount, prec)

@@ -123,7 +123,7 @@ exe = EXE(pyz,
           strip=False,
           upx=False,
           console=False,
-          icon='icons/electrum-zcash.ico',
+          icon='icons/electrum-btcz.ico',
           name=os.path.join('build/electrum-zcash/electrum-zcash', cmdline_name))
 
 # trezorctl separate bin

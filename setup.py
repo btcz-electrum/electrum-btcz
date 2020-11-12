@@ -18,7 +18,7 @@ with open('contrib/requirements/requirements-hw.txt') as f:
 version = imp.load_source('version', 'lib/version.py')
 
 if sys.version_info[:3] < (3, 4, 0):
-    sys.exit("Error: Electrum-Zcash requires Python version >= 3.4.0...")
+    sys.exit("Error: Electrum-BitcoinZ requires Python version >= 3.4.0...")
 
 data_files = []
 
@@ -36,12 +36,12 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
         else:
             usr_share = os.path.expanduser('~/.local/share')
     data_files += [
-        (os.path.join(usr_share, 'applications/'), ['electrum-zcash.desktop']),
-        (os.path.join(usr_share, icons_dirname), ['icons/electrum-zcash.png'])
+        (os.path.join(usr_share, 'applications/'), ['electrum-btcz.desktop']),
+        (os.path.join(usr_share, icons_dirname), ['icons/electrum-btcz.png'])
     ]
 
 setup(
-    name="Electrum-Zcash",
+    name="Electrum-BitcoinZ",
     version=version.ELECTRUM_VERSION,
     install_requires=requirements,
     extras_require={
@@ -78,12 +78,12 @@ setup(
             'locale/*/LC_MESSAGES/electrum.mo',
         ]
     },
-    scripts=['electrum-zcash'],
+    scripts=['electrum-btcz'],
     data_files=data_files,
-    description="Lightweight Zcash Wallet",
-    author="Thomas Voegtlin",
+    description="Lightweight BitcoinZ Wallet",
+    author="Thomas Voegtlin & BitcoinZ dev team",
     author_email="thomasv@electrum.org",
     license="MIT License",
-    url="https://github.com/zebra-lucky/electrum-zcash",
-    long_description="""Lightweight Zcash Wallet"""
+    url="https://github.com/btcz/electrum-btcz",
+    long_description="""Lightweight BitcoinZ Wallet"""
 )

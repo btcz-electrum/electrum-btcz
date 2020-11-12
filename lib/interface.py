@@ -255,7 +255,7 @@ class Interface(util.PrintError):
         self.pipe = util.SocketPipe(socket)
         self.pipe.set_timeout(0.0)  # Don't wait for data
         # Dump network messages.  Set at runtime from the console.
-        self.debug = False
+        self.debug = True
         self.unsent_requests = []
         self.unanswered_requests = {}
         # Set last ping to zero to ensure immediate ping
@@ -295,6 +295,7 @@ class Interface(util.PrintError):
         make_dict = lambda m, p, i: {'method': m, 'params': p, 'id': i}
         n = self.num_requests()
         wire_requests = self.unsent_requests[0:n]
+        print(wire_requests)
         try:
             self.pipe.send_all([make_dict(*r) for r in wire_requests])
         except BaseException as e:

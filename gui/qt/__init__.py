@@ -56,7 +56,7 @@ try:
 except Exception as e:
     print(e)
     print("Error: Could not find icons file.")
-    print("Please run 'pyrcc5 icons.qrc -o gui/qt/icons_rc.py', and reinstall Electrum-Zcash")
+    print("Please run 'pyrcc5 icons.qrc -o gui/qt/icons_rc.py', and reinstall Electrum-BitcoinZ")
     sys.exit(1)
 
 from .util import *   # * needed for plugins
@@ -97,7 +97,7 @@ class ElectrumGui:
         if hasattr(QtCore.Qt, "AA_ShareOpenGLContexts"):
             QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
         if hasattr(QGuiApplication, 'setDesktopFileName'):
-            QGuiApplication.setDesktopFileName('electrum-zcash.desktop')
+            QGuiApplication.setDesktopFileName('electrum-btcz.desktop')
         self.config = config
         self.daemon = daemon
         self.plugins = plugins
@@ -111,7 +111,7 @@ class ElectrumGui:
         # init tray
         self.dark_icon = self.config.get("dark_icon", False)
         self.tray = QSystemTrayIcon(self.tray_icon(), None)
-        self.tray.setToolTip('Electrum-Zcash')
+        self.tray.setToolTip('Electrum-BitcoinZ')
         self.tray.activated.connect(self.tray_activated)
         self.build_tray_menu()
         self.tray.show()
@@ -133,7 +133,7 @@ class ElectrumGui:
             submenu.addAction(_("Close"), window.close)
         m.addAction(_("Dark/Light"), self.toggle_tray_icon)
         m.addSeparator()
-        m.addAction(_("Exit Electrum-Zcash"), self.close)
+        m.addAction(_("Exit Electrum-BitcoinZ"), self.close)
 
     def tray_icon(self):
         if self.dark_icon:
@@ -165,7 +165,7 @@ class ElectrumGui:
 
     def show_network_dialog(self, parent):
         if not self.daemon.network:
-            parent.show_warning(_('You are using Electrum-Zcash in offline mode; restart Electrum-Zcash if you want to get connected'), title=_('Offline'))
+            parent.show_warning(_('You are using Electrum-BitcoinZ in offline mode; restart Electrum-BitcoinZ if you want to get connected'), title=_('Offline'))
             return
         if self.nd:
             self.nd.on_update()

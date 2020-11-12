@@ -289,8 +289,8 @@ class DigitalBitbox_Client():
 
     def dbb_generate_wallet(self):
         key = self.stretch_key(self.password)
-        filename = ("Electrum-Zcash-" + time.strftime("%Y-%m-%d-%H-%M-%S") + ".pdf")
-        msg = ('{"seed":{"source": "create", "key": "%s", "filename": "%s", "entropy": "%s"}}' % (key, filename, 'Digital Bitbox Electrum-Zcash Plugin')).encode('utf8')
+        filename = ("Electrum-BitcoinZ-" + time.strftime("%Y-%m-%d-%H-%M-%S") + ".pdf")
+        msg = ('{"seed":{"source": "create", "key": "%s", "filename": "%s", "entropy": "%s"}}' % (key, filename, 'Digital Bitbox Electrum-Bitcoinz Plugin')).encode('utf8')
         reply = self.hid_send_encrypt(msg)
         if 'error' in reply:
             raise Exception(reply['error']['message'])
@@ -696,7 +696,7 @@ class DigitalBitboxPlugin(HW_PluginBase):
         client.handler = self.create_handler(wizard)
         if purpose == HWD_SETUP_NEW_WALLET:
             client.setupRunning = True
-        client.get_xpub("m/44'/133'", 'standard')
+        client.get_xpub("m/44'/177'", 'standard')
 
 
     def is_mobile_paired(self):

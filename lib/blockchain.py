@@ -28,14 +28,28 @@ from . import bitcoin
 from . import constants
 from .bitcoin import *
 
-HDR_LEN = 1487
+#TEMP
+###
+import binascii
+hfu = binascii.hexlify
+###
+
+HDR_LEN_GENESIS = 141
+HDR_LEN_EPOCH_1 = 1487
+HDR_LEN_EPOCH_2 = 241
+HDR_LEN_COMMON = HDR_LEN_EPOCH_1
+# Equihash parameters (144, 5)
+EPOCH_1_END_BLOCK_HEIGHT = 160010
+# In the original BTCZ the epoch2 start block height is 160000. I added +10 to prevent overlapping as mined blocks use
+# epoch 1 Equihash parameters (200, 9) indeed
+EPOCH_2_START_BLOCK_HEIGHT = 160011
 CHUNK_LEN = 100
 
 MAX_TARGET = 0x0007FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-POW_AVERAGING_WINDOW = 17
+POW_AVERAGING_WINDOW = 13
 POW_MEDIAN_BLOCK_SPAN = 11
-POW_MAX_ADJUST_DOWN = 32
-POW_MAX_ADJUST_UP = 16
+POW_MAX_ADJUST_DOWN = 34
+POW_MAX_ADJUST_UP = 34
 POW_DAMPING_FACTOR = 4
 POW_TARGET_SPACING = 150
 
@@ -50,7 +64,12 @@ MAX_ACTUAL_TIMESPAN = AVERAGING_WINDOW_TIMESPAN * \
     (100 + POW_MAX_ADJUST_DOWN) // 100
 
 
-def serialize_header(res):
+def serialize_header(res, extend_with_zeros=False):
+    solution = res.get('solution')
+    height = res.get('block_height')
+    # Extend with zeros headers of 2nd epoch to store headers correctly
+    if extend_with_zeros:
+        solution += '00' * (HDR_LEN_EPOCH_1 - get_header_length(height))
     s = int_to_hex(res.get('version'), 4) \
         + rev_hex(res.get('prev_block_hash')) \
         + rev_hex(res.get('merkle_root')) \
@@ -59,14 +78,20 @@ def serialize_header(res):
         + int_to_hex(int(res.get('bits')), 4) \
         + rev_hex(res.get('nonce')) \
         + rev_hex(res.get('sol_size')) \
-        + rev_hex(res.get('solution'))
+        + bh2u(bfh(solution))
+        #+ rev_hex(res.get('solution'))
     return s
 
 def deserialize_header(s, height):
     if not s:
         raise Exception('Invalid header: {}'.format(s))
-    if len(s) != HDR_LEN:
+
+    real_header_length = get_header_length(height)
+
+    # We can receive a block to deserialize from both electrum server and db
+    if len(s) != HDR_LEN_COMMON and len(s) != real_header_length:
         raise Exception('Invalid header length: {}'.format(len(s)))
+
     hex_to_int = lambda s: int('0x' + bh2u(s[::-1]), 16)
     h = {}
     h['version'] = hex_to_int(s[0:4])
@@ -76,9 +101,14 @@ def deserialize_header(s, height):
     h['timestamp'] = hex_to_int(s[100:104])
     h['bits'] = hex_to_int(s[104:108])
     h['nonce'] = hash_encode(s[108:140])
-    h['sol_size'] = hash_encode(s[140:143])
-    h['solution'] = hash_encode(s[143:1487])
+    if height >= EPOCH_2_START_BLOCK_HEIGHT:
+        h['sol_size'] = hash_encode(s[140:141])
+        h['solution'] = rev_hex(hash_encode(s[141:real_header_length]))
+    else:
+        h['sol_size'] = hash_encode(s[140:143])
+        h['solution'] = rev_hex(hash_encode(s[143:real_header_length]))
     h['block_height'] = height
+
     return h
 
 def hash_header(header):
@@ -86,7 +116,53 @@ def hash_header(header):
         return '0' * 64
     if header.get('prev_block_hash') is None:
         header['prev_block_hash'] = '00'*32
+
     return hash_encode(Hash(bfh(serialize_header(header))))
+
+def get_header_length(height):
+    if height >= EPOCH_2_START_BLOCK_HEIGHT:
+        return HDR_LEN_EPOCH_2
+    if height > 0:
+        return HDR_LEN_EPOCH_1
+    if height == 0:
+        return HDR_LEN_GENESIS
+
+    return 0
+
+def get_header_size_between(height1, height2):
+    if height1 < 0 and height2 < 0:
+        raise Exception("Can't find header size between two negative heights")
+    #TODO We need to think if we should normalize these negative height values. If we normalize, the size between blocks will be 0
+    if height1 < 0:
+        height1 = 0
+    if height2 < 0:
+        height2 = 0
+
+    diff = abs(height1 - height2)
+    size = 0
+    if diff == 0:
+        return 0
+    if height1 == 0 or height2 == 0:
+        diff -= 1
+        size += HDR_LEN_GENESIS
+
+    min_height = min(height1, height2)
+    max_height = max(height1, height2)
+
+    # all blocks between are in the same epochs so we can just multiply diff on num blocks
+    if (height1 >= EPOCH_2_START_BLOCK_HEIGHT and height2 >= EPOCH_2_START_BLOCK_HEIGHT) \
+        or (height1 <= EPOCH_1_END_BLOCK_HEIGHT and height2 <= EPOCH_1_END_BLOCK_HEIGHT):
+        return size + diff * get_header_length(max_height)
+
+    size = 0
+    for i in range(min_height, max_height):
+        size += get_header_length(i)
+    return size
+
+def calculate_offset_for_header_at(height):
+    if height == 0:
+        return 0
+    return get_header_size_between(0, height)
 
 
 blockchains = {}
@@ -175,9 +251,18 @@ class Blockchain(util.PrintError):
         with self.lock:
             return self._size
 
+    #TODO Size could be truncated at some moment so we need to think if this is the best strategy to estimate the size
+    def estimate_current_size(self):
+        height = self.height()
+        if height > EPOCH_1_END_BLOCK_HEIGHT:
+            epoch_1_size = EPOCH_1_END_BLOCK_HEIGHT * HDR_LEN_EPOCH_1
+            height_diff = height - EPOCH_1_END_BLOCK_HEIGHT
+            return epoch_1_size + height_diff * HDR_LEN_EPOCH_2
+        return height * HDR_LEN_EPOCH_1
+
     def update_size(self):
         p = self.path()
-        self._size = os.path.getsize(p)//HDR_LEN if os.path.exists(p) else 0
+        self._size = os.path.getsize(p)//HDR_LEN_COMMON if os.path.exists(p) else 0
 
     def verify_header(self, header, prev_hash, target):
         _hash = hash_header(header)
@@ -187,17 +272,23 @@ class Blockchain(util.PrintError):
             return
         bits = self.target_to_bits(target)
         if bits != header.get('bits'):
+            self.print_error(f"[verify_header] bits mismatch: bits: {bits} header.bits: {header.get('bits')}")
             raise Exception("bits mismatch: %s vs %s" % (bits, header.get('bits')))
-        if int('0x' + _hash, 16) > target:
+        if header['block_height'] != 0 and int('0x' + _hash, 16) > target:
             raise Exception("insufficient proof of work: %s vs target %s" % (int('0x' + _hash, 16), target))
 
     def verify_chunk(self, index, data):
-        num = len(data) // HDR_LEN
+        num_headers = CHUNK_LEN
         prev_hash = self.get_hash(index * CHUNK_LEN - 1)
+        data_cursor_pos = 0
         chunk_headers = {'empty': True}
-        for i in range(num):
-            raw_header = data[i*HDR_LEN:(i+1) * HDR_LEN]
+        for i in range(num_headers):
             height = index * CHUNK_LEN + i
+            header_length = get_header_length(height)
+            raw_header = data[data_cursor_pos:data_cursor_pos + header_length]
+            if data_cursor_pos + header_length > len(data):
+                break
+            data_cursor_pos += header_length
             header = deserialize_header(raw_header, height)
             target = self.get_target(height, chunk_headers)
             self.verify_header(header, prev_hash, target)
@@ -214,9 +305,32 @@ class Blockchain(util.PrintError):
         filename = 'blockchain_headers' if self.parent_id is None else os.path.join('forks', 'fork_%d_%d'%(self.parent_id, self.checkpoint))
         return os.path.join(d, filename)
 
+    def modify_chunk(self, index, chunk):
+        num_headers = CHUNK_LEN
+        data_cursor_pos = 0
+        new_data_cursor_pos = 0
+
+        new_chunk = bytearray(HDR_LEN_COMMON * num_headers)
+        for i in range(num_headers):
+            height = index * CHUNK_LEN + i
+            real_header_length = get_header_length(height)
+            if data_cursor_pos + real_header_length > len(chunk):
+                #self.print_error(f"[modify_chunk] reached the end of the chunk. Last processed header in chunk: {i-1}")
+                break
+            raw_header = chunk[data_cursor_pos:data_cursor_pos + real_header_length]
+            new_chunk[new_data_cursor_pos:new_data_cursor_pos + real_header_length] = raw_header
+
+            data_cursor_pos += real_header_length
+            new_data_cursor_pos += HDR_LEN_COMMON
+        # Trim all redundant empty data (if the chunk is smaller than CHUNK_LEN)
+        new_chunk = new_chunk[:new_data_cursor_pos]
+        #self.print_error(f"[modify_chunk] Finished. Num headers: {i} Old size: {len(chunk)} New size: {len(new_chunk)}")
+        return new_chunk
+
     def save_chunk(self, index, chunk):
         filename = self.path()
-        d = (index * CHUNK_LEN - self.checkpoint) * HDR_LEN
+        chunk = self.modify_chunk(index, chunk)
+        d = (index * CHUNK_LEN - self.checkpoint) * HDR_LEN_COMMON
         if d < 0:
             chunk = chunk[-d:]
             d = 0
@@ -237,10 +351,16 @@ class Blockchain(util.PrintError):
         with open(self.path(), 'rb') as f:
             my_data = f.read()
         with open(parent.path(), 'rb') as f:
-            f.seek((checkpoint - parent.checkpoint)*HDR_LEN)
-            parent_data = f.read(parent_branch_size*HDR_LEN)
+            #TODO Check swap with parents
+            #f.seek((checkpoint - parent.checkpoint)*header_length)
+            #parent_data = f.read(parent_branch_size*header_length)
+            f.seek(get_header_size_between(checkpoint, parent.checkpoint))
+            parent_data = f.read(get_header_size_between(self.parent().height(), self.checkpoint + 1))
+
         self.write(parent_data, 0)
-        parent.write(my_data, (checkpoint - parent.checkpoint)*HDR_LEN)
+        #TODO Check swap with parents
+        #parent.write(my_data, (checkpoint - parent.checkpoint)*header_length)
+        parent.write(my_data, get_header_size_between(checkpoint, parent.checkpoint))
         # store file path
         for b in blockchains.values():
             b.old_path = b.path()
@@ -262,7 +382,7 @@ class Blockchain(util.PrintError):
         filename = self.path()
         with self.lock:
             with open(filename, 'rb+') as f:
-                if truncate and offset != self._size*HDR_LEN:
+                if truncate and offset != self._size * HDR_LEN_EPOCH_1:
                     f.seek(offset)
                     f.truncate()
                 f.seek(offset)
@@ -272,11 +392,14 @@ class Blockchain(util.PrintError):
             self.update_size()
 
     def save_header(self, header):
-        delta = header.get('block_height') - self.checkpoint
-        data = bfh(serialize_header(header))
+        height = header.get('block_height')
+        delta = height - self.checkpoint
+        data = bfh(serialize_header(header, extend_with_zeros=True))
         assert delta == self.size()
-        assert len(data) == HDR_LEN
-        self.write(data, delta*HDR_LEN)
+        header_length = HDR_LEN_COMMON
+        assert len(data) == header_length
+        self.write(data, delta * header_length)
+        #self.write(data, calculate_offset_for_header_at(height))
         self.swap_with_parent()
 
     def read_header(self, height):
@@ -288,18 +411,19 @@ class Blockchain(util.PrintError):
         if height > self.height():
             return
         delta = height - self.checkpoint
+        header_length = HDR_LEN_COMMON
         name = self.path()
         if os.path.exists(name):
             with open(name, 'rb') as f:
-                f.seek(delta * HDR_LEN)
-                h = f.read(HDR_LEN)
-                if len(h) < HDR_LEN:
+                f.seek(delta * header_length)
+                h = f.read(header_length)
+                if len(h) < header_length:
                     raise Exception('Expected to read a full header. This was only {} bytes'.format(len(h)))
         elif not os.path.exists(util.get_headers_dir(self.config)):
             raise Exception('Electrum datadir does not exist. Was it deleted while running?')
         else:
             raise Exception('Cannot find headers file but datadir is there. Should be at {}'.format(name))
-        if h == bytes([0])*HDR_LEN:
+        if h == bytes([0])*header_length:
             return None
         return deserialize_header(h, height)
 
@@ -348,6 +472,9 @@ class Blockchain(util.PrintError):
             max_height = chunk_headers['max_height']
 
         if height <= POW_AVERAGING_WINDOW:
+            return MAX_TARGET
+        # Reset the difficulty after the algo fork
+        if height > EPOCH_1_END_BLOCK_HEIGHT and height < EPOCH_1_END_BLOCK_HEIGHT + POW_AVERAGING_WINDOW + 1:
             return MAX_TARGET
 
         height_range = range(max(0, height - POW_AVERAGING_WINDOW),
@@ -405,7 +532,6 @@ class Blockchain(util.PrintError):
             return False
         height = header['block_height']
         if check_height and self.height() != height - 1:
-            #self.print_error("cannot connect at height", height)
             return False
         if height == 0:
             return hash_header(header) == constants.net.GENESIS
@@ -426,7 +552,6 @@ class Blockchain(util.PrintError):
         try:
             data = bfh(hexdata)
             self.verify_chunk(idx, data)
-            #self.print_error("validated chunk %d" % idx)
             self.save_chunk(idx, data)
             return True
         except BaseException as e:
@@ -448,9 +573,11 @@ class Blockchain(util.PrintError):
                 with open(self.path(), 'rb') as f:
                     lower_header = height - TARGET_CALC_BLOCKS
                     for height in range(height, lower_header-1, -1):
-                        f.seek(height*HDR_LEN)
-                        hd = f.read(HDR_LEN)
-                        if len(hd) < HDR_LEN:
+                        header_length = HDR_LEN_COMMON
+                        f.seek(height * header_length)
+                        #f.seek(calculate_offset_for_header_at(height))
+                        hd = f.read(header_length)
+                        if len(hd) < header_length:
                             raise Exception(
                                 'Expected to read a full header.'
                                 ' This was only {} bytes'.format(len(hd)))

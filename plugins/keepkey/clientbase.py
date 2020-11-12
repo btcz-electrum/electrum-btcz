@@ -62,7 +62,7 @@ class GuiMixin(object):
             msg = _("Enter a passphrase to generate this wallet.  Each time "
                     "you use this wallet your {} will prompt you for the "
                     "passphrase.  If you forget the passphrase you cannot "
-                    "access the Zcash coins in the wallet.").format(self.device)
+                    "access the BitcoinZ coins in the wallet.").format(self.device)
         else:
             msg = _("Enter the passphrase to unlock this wallet:")
         passphrase = self.handler.get_passphrase(msg, self.creating_wallet)
@@ -121,8 +121,8 @@ class KeepKeyClientBase(GuiMixin, PrintError):
 
     def has_usable_connection_with_device(self):
         try:
-            res = self.ping("electrum-zcash pinging device")
-            assert res == "electrum-zcash pinging device"
+            res = self.ping("electrum-btcz pinging device")
+            assert res == "electrum-btcz pinging device"
         except BaseException:
             return False
         return True

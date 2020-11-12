@@ -37,7 +37,7 @@ import socks
 from . import util
 from . import bitcoin
 from .bitcoin import *
-from .blockchain import HDR_LEN, CHUNK_LEN
+from .blockchain import HDR_LEN_EPOCH_2, HDR_LEN_COMMON, CHUNK_LEN, get_header_length, calculate_offset_for_header_at
 from . import constants
 from .interface import Connection, Interface
 from . import blockchain
@@ -722,7 +722,7 @@ class Network(util.DaemonThread):
         interface.mode = 'default'
         interface.request = None
         self.interfaces[server] = interface
-        self.queue_request('blockchain.headers.subscribe', [True], interface)
+        self.queue_request('blockchain.headers.subscribe', [], interface)
         if server == self.default_server:
             self.switch_to_interface(server)
         #self.notify('interfaces')
@@ -780,6 +780,8 @@ class Network(util.DaemonThread):
         self.requested_chunks.add(index)
         self.queue_request('blockchain.block.headers',
                            [CHUNK_LEN*index, CHUNK_LEN], interface)
+        if CHUNK_LEN == 1:
+            interface.request = index * CHUNK_LEN
 
     def on_get_chunk(self, interface, response, height):
         '''Handle receiving a chunk of block headers'''
@@ -831,8 +833,9 @@ class Network(util.DaemonThread):
             self.connection_down(interface.server)
             return
 
-        if len(hex_header) != HDR_LEN*2:
-            interface.print_error('wrong header length', interface.request)
+        header_length = get_header_length(height)
+        if height != 0 and len(hex_header) != header_length*2:
+            interface.print_error('wrong header length', interface.request, "at height", height)
             self.connection_down(interface.server)
             return
 
@@ -937,8 +940,10 @@ class Network(util.DaemonThread):
                 self.switch_lagging_interface()
                 self.notify('updated')
 
+
         else:
             raise Exception(interface.mode)
+
         # If not finished, get the next header
         interface.request = None
         if next_height:
@@ -985,12 +990,15 @@ class Network(util.DaemonThread):
         b = self.blockchains[0]
         filename = b.path()
         len_checkpoints = len(constants.net.CHECKPOINTS)
-        length = HDR_LEN * len_checkpoints * CHUNK_LEN
+        # We try to estimate the length roughly on the bigger header length, so it will require to update the headers
+        # file more frequent though it should be correct
+        #length = HDR_LEN_EPOCH_2 * len_checkpoints * CHUNK_LEN
+        length = HDR_LEN_COMMON * len_checkpoints * CHUNK_LEN
         if not os.path.exists(filename) or os.path.getsize(filename) < length:
             with open(filename, 'wb') as f:
                 for i in range(len_checkpoints):
                     for height, header_data in b.checkpoints[i][2]:
-                        f.seek(height*HDR_LEN)
+                        f.seek(height * HDR_LEN_COMMON)
                         bin_header = bfh(header_data)
                         f.write(bin_header)
         with b.lock:
@@ -1013,8 +1021,9 @@ class Network(util.DaemonThread):
         if not height or not hex_header:
             return
 
-        if len(hex_header) != HDR_LEN*2:
-            interface.print_error('wrong header length', interface.request)
+        header_length = get_header_length(height)
+        if height != 0 and len(hex_header) != header_length*2:
+            interface.print_error('wrong header length', interface.request, "at height", height)
             self.connection_down(interface.server)
             return
 

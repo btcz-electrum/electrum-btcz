@@ -74,7 +74,7 @@
   !define MUI_ABORTWARNING
   !define MUI_ABORTWARNING_TEXT "Are you sure you wish to abort the installation of ${PRODUCT_NAME}?"
   
-  !define MUI_ICON "icons\electrum-zcash.ico"
+  !define MUI_ICON "icons\electrum-btcz.ico"
   
 ;--------------------------------
 ;Pages
@@ -123,7 +123,7 @@ Section
 
   ;Files to pack into the installer
   File /r "dist\electrum-zcash\*.*"
-  File "icons\electrum-zcash.ico"
+  File "icons\electrum-btcz.ico"
 
   ;Store installation folder
   WriteRegStr HKCU "Software\${PRODUCT_NAME}" "" $INSTDIR

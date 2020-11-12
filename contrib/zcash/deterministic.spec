@@ -120,7 +120,7 @@ exe = EXE(pyz,
           strip=False,
           upx=False,
           console=False,
-          icon='icons/electrum-zcash.ico',
+          icon='icons/electrum-btcz.ico',
           name=os.path.join('build\\pyi.win32\\electrum', cmdline_name))
 
 # exe with console output
@@ -131,7 +131,7 @@ conexe = EXE(pyz,
           strip=False,
           upx=False,
           console=True,
-          icon='icons/electrum-zcash.ico',
+          icon='icons/electrum-btcz.ico',
           name=os.path.join('build\\pyi.win32\\electrum',
                             'console-%s' % cmdline_name))
 

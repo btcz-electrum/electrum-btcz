@@ -1,0 +1,21 @@
+# If you want Electrum-BitcoinZ to appear in a Linux app launcher ("start menu"), install this by doing:
+# sudo desktop-file-install electrum-btcz.desktop
+
+[Desktop Entry]
+Comment=Lightweight BitcoinZ Client
+Exec=sh -c "PATH=\"\\$HOME/.local/bin:\\$PATH\" electrum-btcz %u"
+GenericName[en_US]=BitcoinZ Wallet
+GenericName=BitcoinZ Wallet
+Icon=electrum-btcz.png
+Name[en_US]=Electrum-Bitcoinz Bitcoin Wallet
+Name=Electrum-BitcoinZ Bitcoin Wallet
+Categories=Finance;Network;
+StartupNotify=false
+Terminal=false
+Type=Application
+MimeType=x-scheme-handler/bitcoinz;
+Actions=Testnet;
+
+[Desktop Action Testnet]
+Exec=sh -c "PATH=\"\\$HOME/.local/bin:\\$PATH\" electrum-btcz --testnet %u"
+Name=Testnet mode
