@@ -16,7 +16,7 @@ FEE_DEPTH_TARGETS = [10000000, 5000000, 2000000, 1000000, 500000, 200000, 100000
 # satoshi per kbyte
 FEERATE_MAX_DYNAMIC = 150000
 FEERATE_WARNING_HIGH_FEE = 100000
-FEERATE_FALLBACK_STATIC_FEE = 1000
+FEERATE_FALLBACK_STATIC_FEE = 42000
 FEERATE_DEFAULT_RELAY = 1000
 FEERATE_STATIC_VALUES = [150, 300, 500, 1000, 1500, 2500, 3500, 5000, 7500, 10000]
 
@@ -434,10 +434,10 @@ class SimpleConfig(PrintError):
             return self.has_fee_etas()
 
     def is_dynfee(self):
-        return bool(self.get('dynamic_fees', True))
+        return bool(self.get('dynamic_fees', False))
 
     def use_mempool_fees(self):
-        return False
+        return True
 
     def fee_per_kb(self, dyn=None, mempool=None):
         """Returns sat/kvB fee to pay for a txn.

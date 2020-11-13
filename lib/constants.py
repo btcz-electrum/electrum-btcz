@@ -29,12 +29,10 @@ import json
 
 def read_json(filename, default):
     path = os.path.join(os.path.dirname(__file__), filename)
-    print("Checkpoints at: " + path)
     try:
         with open(path, 'r') as f:
             r = json.loads(f.read())
     except:
-        print("GOT EXCEPTION!")
         r = default
     return r
 
