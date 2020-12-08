@@ -91,7 +91,7 @@ excludes += [
     'PyQt5.QtWinExtras',
 ]
 
-a = Analysis(['electrum-zcash'],
+a = Analysis(['electrum-btcz'],
              pathex=['plugins'],
              hiddenimports=hiddenimports,
              datas=datas,
@@ -124,7 +124,7 @@ exe = EXE(pyz,
           upx=False,
           console=False,
           icon='icons/electrum-btcz.ico',
-          name=os.path.join('build/electrum-zcash/electrum-zcash', cmdline_name))
+          name=os.path.join('build/electrum-btcz/electrum-btcz', cmdline_name))
 
 # trezorctl separate bin
 tctl_a = Analysis([os.path.join(PY36BINDIR, 'trezorctl')],
@@ -141,17 +141,17 @@ tctl_exe = EXE(tctl_pyz,
            strip=False,
            upx=False,
            console=True,
-           name=os.path.join('build/electrum-zcash/electrum-zcash', 'trezorctl.bin'))
+           name=os.path.join('build/electrum-btcz/electrum-btcz', 'trezorctl.bin'))
 
 coll = COLLECT(exe, tctl_exe,
                a.binaries,
                a.datas,
                strip=False,
                upx=False,
-               name=os.path.join('dist', 'electrum-zcash'))
+               name=os.path.join('dist', 'electrum-btcz'))
 
 app = BUNDLE(coll,
-             name=os.path.join('dist', 'Electrum-Zcash.app'),
-             appname="Electrum-Zcash",
-	         icon='electrum-zcash.icns',
+             name=os.path.join('dist', 'Electrum-BTCZ.app'),
+             appname="Electrum-BTCZ",
+	         icon='electrum-btcz.icns',
              version = 'ELECTRUM_VERSION')

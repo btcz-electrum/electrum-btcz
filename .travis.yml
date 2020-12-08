@@ -22,8 +22,8 @@ matrix:
     os: linux
     python: "3.6"
 before_install:
-- source contrib/zcash/travis/electrum_zcash_version_env.sh
-- echo electrum-zcash version is $ELECTRUM_ZCASH_VERSION
+- source contrib/zcash/travis/electrum_btcz_version_env.sh
+- echo electrum-btcz version is $ELECTRUM_BTCZ_VERSION
 - mkdir -p build && cp contrib/zcash/travis/* ./build/
 - if [[ -n $TRAVIS_TAG ]] && [[ $TRAVIS_OS_NAME == 'osx' ]]; then
       ./build/before_install-osx.sh;
@@ -53,23 +53,27 @@ script:
   fi
 deploy:
 - provider: releases
-  api_key:
-    secure: G+TcxPJSQQ2bTNhkTX4aofnsiNFrzbuFTGty/+jIKDb/IQ69etXS9Ulu8KGD71VjEdXugFWdus+2a8fFSCSg79+AvrSxKa1ztXQ2q6tmovRkUcnF5Bkbc+ORLm3+FMZhonvMg+MLnHS3hnvJL/CZU0Pn2dkfODn7/t+MsGs99MN0G44qimq+FCu+YHaKVcGgiTs1I6nextIH+lnPw5qE6VxTQKdFp4PTHqY1qZJWamReVvtyMnfGpa+QwcKf43dXzZrHMLfFprfzEi1DExrhRi0a8RZlFWmAtkwH9zzJXzqOEmivniLfeALJzWkBJG4I2Fu7QSQhvPllhnt5uGdV3pgmHZUxL1DZckrqVG5b6P/Cnmbu0hWXbkPpZ7sXQ4X7wGhAVgH2sRPF1SfE9XvqDsmKvpspdKGmI+9yKoaWekbt8igfJ8jRBK4yRJAt+F/waeXkj7HJhSPIYg9wNvYCnCmoih4brRcTE4nyJBo/ySY3DVocflS3QGoClOrBpwXGgzwaUzBamRhJeCUe9ockPJyUs9DkuBIdsPfhq0nZfZFMhNBtpzm1hPGE92NojUi+DcI12WqweUqDWZzY/02MmfHLeN6mGgjTWvgOwnq1fvc6s7sVy7nANtA6UseWF2KUBYfuMKAxTU4WadpZ102znz4XiL4B7TILKJMU+Ht+a+c=
+  api-key: $GITHUB_TOKEN
+  #api-key:
+  #  secure: D7ssv+/nbx5n3jKHu+yVjjE+Nmz87K6lmkB/wewJEYGHhPeg261MHKH9y+8rfGjfCZocN0VGY0gyW7deUUCdqEqhbKo2rWMU+6N/AD3oQ4pJ+4LqJ9g9Bh2Cyz1Mh4d2fRHde01j2eTJFyn9xI6ImQvPHpZuN93b2bdRQdPS01lOT6zbyMfLC5fS0uVQO+uQWXQvJay3/Nr+QVw+AH4bUp20711uRQzdmm3xlUXluUdy2IHf67vaYrj3rd7iOOGimTZQnvFl43kgecbNAJfcc88SQ7RRQFkDP57+tQ8E9zsKV67sheGUvoReGbjdB/Zom85LjBd9l2tSW5lsztlwnmyfAYWzBw6cE+5VWrgITm5UxKa69cSadtdTHlRYP/1CFGKC+UPiliel6NeC5LezBSuRE1y5va7JUSYVc+VgiF9UmASHsvREhz1X+vdP3bJAJzGup+U347R7n20WEjJYDRAGn9cEfV0OcieRUJJElNzSKfyznSbbfY159btj2SA0YOJB0xwWYqt5LjcLnSKtpxD94fSMgE8qJmSKgYbtg9SR93M16xA14KnxRC/HlWZglwsEZ81Njqs96chLa44SwdOK1qCf2VBFAyXLjc9t/percvYPMl0DwZEE4RkFcuEuj0v9An5VB84byHcekWtlWghIS29VQWPVymU6Gi6vDuc=
   file:
-  - build/electrum-zcash/dist/electrum-zcash-$ELECTRUM_ZCASH_VERSION-macosx.dmg
+  - build/electrum-btcz/dist/electrum-btcz-$ELECTRUM_BTCZ_VERSION-macosx.dmg
   on:
-    repo: zebra-lucky/electrum-zcash
-    tags: true
+    #repo: sept-en/electrum-zcash-or-btcz
+    #tags: true
+    all_branches: true
     condition: "$TRAVIS_OS_NAME = osx"
 - provider: releases
-  api_key:
-    secure: G+TcxPJSQQ2bTNhkTX4aofnsiNFrzbuFTGty/+jIKDb/IQ69etXS9Ulu8KGD71VjEdXugFWdus+2a8fFSCSg79+AvrSxKa1ztXQ2q6tmovRkUcnF5Bkbc+ORLm3+FMZhonvMg+MLnHS3hnvJL/CZU0Pn2dkfODn7/t+MsGs99MN0G44qimq+FCu+YHaKVcGgiTs1I6nextIH+lnPw5qE6VxTQKdFp4PTHqY1qZJWamReVvtyMnfGpa+QwcKf43dXzZrHMLfFprfzEi1DExrhRi0a8RZlFWmAtkwH9zzJXzqOEmivniLfeALJzWkBJG4I2Fu7QSQhvPllhnt5uGdV3pgmHZUxL1DZckrqVG5b6P/Cnmbu0hWXbkPpZ7sXQ4X7wGhAVgH2sRPF1SfE9XvqDsmKvpspdKGmI+9yKoaWekbt8igfJ8jRBK4yRJAt+F/waeXkj7HJhSPIYg9wNvYCnCmoih4brRcTE4nyJBo/ySY3DVocflS3QGoClOrBpwXGgzwaUzBamRhJeCUe9ockPJyUs9DkuBIdsPfhq0nZfZFMhNBtpzm1hPGE92NojUi+DcI12WqweUqDWZzY/02MmfHLeN6mGgjTWvgOwnq1fvc6s7sVy7nANtA6UseWF2KUBYfuMKAxTU4WadpZ102znz4XiL4B7TILKJMU+Ht+a+c=
+  api-key: $GITHUB_TOKEN
+  #api-key:
+    #secure: D7ssv+/nbx5n3jKHu+yVjjE+Nmz87K6lmkB/wewJEYGHhPeg261MHKH9y+8rfGjfCZocN0VGY0gyW7deUUCdqEqhbKo2rWMU+6N/AD3oQ4pJ+4LqJ9g9Bh2Cyz1Mh4d2fRHde01j2eTJFyn9xI6ImQvPHpZuN93b2bdRQdPS01lOT6zbyMfLC5fS0uVQO+uQWXQvJay3/Nr+QVw+AH4bUp20711uRQzdmm3xlUXluUdy2IHf67vaYrj3rd7iOOGimTZQnvFl43kgecbNAJfcc88SQ7RRQFkDP57+tQ8E9zsKV67sheGUvoReGbjdB/Zom85LjBd9l2tSW5lsztlwnmyfAYWzBw6cE+5VWrgITm5UxKa69cSadtdTHlRYP/1CFGKC+UPiliel6NeC5LezBSuRE1y5va7JUSYVc+VgiF9UmASHsvREhz1X+vdP3bJAJzGup+U347R7n20WEjJYDRAGn9cEfV0OcieRUJJElNzSKfyznSbbfY159btj2SA0YOJB0xwWYqt5LjcLnSKtpxD94fSMgE8qJmSKgYbtg9SR93M16xA14KnxRC/HlWZglwsEZ81Njqs96chLa44SwdOK1qCf2VBFAyXLjc9t/percvYPMl0DwZEE4RkFcuEuj0v9An5VB84byHcekWtlWghIS29VQWPVymU6Gi6vDuc=
   file:
-  - build/electrum-zcash/dist/Electrum-Zcash-$ELECTRUM_ZCASH_VERSION.tar.gz
-  - build/electrum-zcash/dist/electrum-zcash-$ELECTRUM_ZCASH_VERSION-setup-win32.exe
-  - build/electrum-zcash/dist/electrum-zcash-$ELECTRUM_ZCASH_VERSION-setup-win64.exe
-  - build/electrum-zcash/bin/Electrum_Zcash-$ELECTRUM_ZCASH_APK_VERSION-release-unsigned.apk
+  - build/electrum-btcz/dist/Electrum-btcz-$ELECTRUM_BTCZ_VERSION.tar.gz
+  - build/electrum-btcz/dist/electrum-btcz-$ELECTRUM_BTCZ_VERSION-setup-win32.exe
+  - build/electrum-btcz/dist/electrum-btcz-$ELECTRUM_BTCZ_VERSION-setup-win64.exe
+  - build/electrum-btcz/bin/Electrum_BTCZ-$ELECTRUM_BTCZ_APK_VERSION-release-unsigned.apk
   on:
-    repo: zebra-lucky/electrum-zcash
-    tags: true
+    #repo: sept-en/electrum-zcash-or-btcz
+    all_branches: true
+    #tags: true
     condition: "$TRAVIS_OS_NAME = linux"

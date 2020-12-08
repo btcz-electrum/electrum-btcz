@@ -7,7 +7,7 @@
 ;--------------------------------
 ;Variables
 
-  !define PRODUCT_NAME "Electrum-Zcash"
+  !define PRODUCT_NAME "Electrum-BTCZ"
   !define PRODUCT_WEB_SITE "https://github.com/zebra-lucky/electrum-zcash"
   !define PRODUCT_PUBLISHER "Electrum Technologies GmbH"
   !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -18,7 +18,7 @@
 
   ;Name and file
   Name "${PRODUCT_NAME}"
-  OutFile "dist/electrum-zcash-${PRODUCT_VERSION}-setup-${BUILD_ARCH}.exe"
+  OutFile "dist/electrum-btcz-${PRODUCT_VERSION}-setup-${BUILD_ARCH}.exe"
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
@@ -122,7 +122,7 @@ Section
   Delete "$SMPROGRAMS\${PRODUCT_NAME}\*.*"
 
   ;Files to pack into the installer
-  File /r "dist\electrum-zcash\*.*"
+  File /r "dist\electrum-btcz\*.*"
   File "icons\electrum-btcz.ico"
 
   ;Store installation folder
@@ -134,21 +134,21 @@ Section
 
   ;Create desktop shortcut
   DetailPrint "Creating desktop shortcut..."
-  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\electrum-zcash-${PRODUCT_VERSION}.exe" ""
+  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\electrum-btcz-${PRODUCT_VERSION}.exe" ""
 
   ;Create start-menu items
   DetailPrint "Creating start-menu items..."
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
   CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\electrum-zcash-${PRODUCT_VERSION}.exe" "" "$INSTDIR\electrum-zcash-${PRODUCT_VERSION}.exe" 0
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME} Testnet.lnk" "$INSTDIR\electrum-zcash-${PRODUCT_VERSION}.exe" "--testnet" "$INSTDIR\electrum-zcash-${PRODUCT_VERSION}.exe" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\electrum-btcz-${PRODUCT_VERSION}.exe" "" "$INSTDIR\electrum-btcz-${PRODUCT_VERSION}.exe" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME} Testnet.lnk" "$INSTDIR\electrum-btcz-${PRODUCT_VERSION}.exe" "--testnet" "$INSTDIR\electrum-btcz-${PRODUCT_VERSION}.exe" 0
 
 
-  ;Links zcash: URI's to Electrum
-  WriteRegStr HKCU "Software\Classes\zcash" "" "URL:zcash Protocol"
-  WriteRegStr HKCU "Software\Classes\zcash" "URL Protocol" ""
-  WriteRegStr HKCU "Software\Classes\zcash" "DefaultIcon" "$\"$INSTDIR\electrum-zcash.ico, 0$\""
-  WriteRegStr HKCU "Software\Classes\zcash\shell\open\command" "" "$\"$INSTDIR\electrum-zcash-${PRODUCT_VERSION}.exe$\" $\"%1$\""
+  ;Links bitcoinz: URI's to Electrum
+  WriteRegStr HKCU "Software\Classes\btcz" "" "URL:bitcoinz Protocol"
+  WriteRegStr HKCU "Software\Classes\btcz" "URL Protocol" ""
+  WriteRegStr HKCU "Software\Classes\btcz" "DefaultIcon" "$\"$INSTDIR\electrum-btcz.ico, 0$\""
+  WriteRegStr HKCU "Software\Classes\btcz\shell\open\command" "" "$\"$INSTDIR\electrum-btcz-${PRODUCT_VERSION}.exe$\" $\"%1$\""
 
   ;Adds an uninstaller possibility to Windows Uninstall or change a program section
   WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
@@ -156,7 +156,7 @@ Section
   WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
-  WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\electrum-zcash.ico"
+  WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\electrum-btcz.ico"
 
   ;Fixes Windows broken size estimates
   ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
@@ -179,7 +179,7 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\${PRODUCT_NAME}\*.*"
   RMDir  "$SMPROGRAMS\${PRODUCT_NAME}"
   
-  DeleteRegKey HKCU "Software\Classes\zcash"
+  DeleteRegKey HKCU "Software\Classes\btcz"
   DeleteRegKey HKCU "Software\${PRODUCT_NAME}"
   DeleteRegKey HKCU "${PRODUCT_UNINST_KEY}"
 SectionEnd

@@ -1,9 +1,9 @@
 include LICENCE RELEASE-NOTES AUTHORS
 include README.rst
-include electrum-zcash.conf.sample
-include electrum-zcash.desktop
+include electrum-btcz.conf.sample
+include electrum-btcz.desktop
 include *.py
-include electrum-zcash
+include electrum-btcz
 include contrib/requirements/requirements.txt
 include contrib/requirements/requirements-hw.txt
 recursive-include lib *.py

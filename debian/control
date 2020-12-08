@@ -1,4 +1,4 @@
-Source: electrum-zcash
+Source: electrum-btcz
 Section: utils
 Priority: optional
 Maintainer: Maksym Yuzhakov <zebra.lucky@gmail.com>
@@ -22,7 +22,7 @@ Standards-Version: 4.1.3
 Homepage: https://github.com/zebra-lucky/electrum-zcash
 X-Python3-Version: >= 3.4
 
-Package: python3-electrum-zcash
+Package: python3-electrum-btcz
 Architecture: all
 Section: python
 Depends:
@@ -42,12 +42,12 @@ Description: Easy to use Zcash client - Python module
  This package provides the "electrum_zcash" Python 3 module which can be used
  to access a Zcash wallet from Python programs.
 
-Package: electrum-zcash
+Package: electrum-btcz
 Architecture: all
 Depends:
  ${misc:Depends},
  ${python3:Depends},
- python3-electrum-zcash (= ${binary:Version}),
+ python3-electrum-btcz (= ${binary:Version}),
 Recommends: python3-pyqt5
 Description: Easy to use Zcash client
  This package provides a lightweight Zcash client which protects

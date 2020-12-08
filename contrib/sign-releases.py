@@ -27,7 +27,7 @@ Manual signing:
     jarsigner -verbose \
         -tsa http://sha256timestamp.ws.symantec.com/sha256/timestamp \
         -sigalg SHA1withRSA -digestalg SHA1 \
-        -sigfile zcash-electrum \
+        -sigfile btcz-electrum \
         -keystore ~/.jks/keystore \
         Electrum_Zcash-3.0.6.1-release-unsigned.apk \
         electrum.z.cash
@@ -143,9 +143,9 @@ PEP440_PUBVER_PATTERN = re.compile('^((\d+)!)?'
                                    '([a-zA-Z]+\d+)?'
                                    '((\.[a-zA-Z]+\d+)*)$')
 REL_NOTES_PATTERN = re.compile('^#.+?(^[^#].+?)^#.+?', re.M | re.S)
-SDIST_NAME_PATTERN = re.compile('^Electrum-Zcash-(.*).tar.gz$')
-SDIST_DIR_TEMPLATE = 'Electrum-Zcash-{version}'
-PPA_SOURCE_NAME = 'electrum-zcash'
+SDIST_NAME_PATTERN = re.compile('^Electrum-BTCZ-(.*).tar.gz$')
+SDIST_DIR_TEMPLATE = 'Electrum-BTCZ-{version}'
+PPA_SOURCE_NAME = 'electrum-btcz'
 PPA_ORIG_NAME_TEMPLATE = '%s_{version}.orig.tar.gz' % PPA_SOURCE_NAME
 CHANGELOG_TEMPLATE = """%s ({ppa_version}) {series}; urgency=medium
 {changes} -- {uid}  {time}""" % PPA_SOURCE_NAME
@@ -164,12 +164,12 @@ JARSIGNER_ARGS = [
     'jarsigner', '-verbose',
     '-tsa', 'http://sha256timestamp.ws.symantec.com/sha256/timestamp',
     '-sigalg', 'SHA1withRSA', '-digestalg', 'SHA1',
-    '-sigfile', 'zcash-electrum',
+    '-sigfile', 'btcz-electrum',
     '-storepass:env', JKS_STOREPASS,
     '-keypass:env', JKS_KEYPASS,
 ]
-UNSIGNED_APK_PATTERN = re.compile('^Electrum_Zcash-(.*)-release-unsigned.apk$')
-SIGNED_APK_TEMPLATE = 'Electrum_Zcash-{version}-release.apk'
+UNSIGNED_APK_PATTERN = re.compile('^Electrum_BTCZ-(.*)-release-unsigned.apk$')
+SIGNED_APK_TEMPLATE = 'Electrum_BTCZ-{version}-release.apk'
 
 
 os.environ['QUILT_PATCHES'] = 'debian/patches'

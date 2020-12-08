@@ -6,18 +6,18 @@ if [[ -z $TRAVIS_TAG ]]; then
   exit 1
 fi
 
-BUILD_REPO_URL=https://github.com/zebra-lucky/electrum-zcash
+BUILD_REPO_URL=https://github.com/btcz-electrum/electrum-btcz
 
 cd build
 
-git clone --branch $TRAVIS_TAG $BUILD_REPO_URL electrum-zcash
+git clone --branch $TRAVIS_TAG $BUILD_REPO_URL electrum-btcz
 
-cd electrum-zcash
+cd electrum-btcz
 
 export PY36BINDIR=/Library/Frameworks/Python.framework/Versions/3.6/bin/
 export PATH=$PATH:$PY36BINDIR
-source ./contrib/zcash/travis/electrum_zcash_version_env.sh;
-echo wine build version is $ELECTRUM_ZCASH_VERSION
+source ./contrib/zcash/travis/electrum_btcz_version_env.sh;
+echo wine build version is $ELECTRUM_BTCZ_VERSION
 
 sudo pip3 install --upgrade pip
 sudo pip3 install -r contrib/deterministic-build/requirements.txt
@@ -40,9 +40,9 @@ cp contrib/zcash/pyi_tctl_runtimehook.py .
 
 pyinstaller \
     -y \
-    --name electrum-zcash-$ELECTRUM_ZCASH_VERSION.bin \
+    --name electrum-btcz-$ELECTRUM_BTCZ_VERSION.bin \
     osx.spec
 
-sudo hdiutil create -fs HFS+ -volname "Electrum-Zcash" \
-    -srcfolder dist/Electrum-Zcash.app \
-    dist/electrum-zcash-$ELECTRUM_ZCASH_VERSION-macosx.dmg
+sudo hdiutil create -fs HFS+ -volname "Electrum-BTCZ" \
+    -srcfolder dist/Electrum-BTCZ.app \
+    dist/electrum-btcz-$ELECTRUM_BTCZ_VERSION-macosx.dmg
