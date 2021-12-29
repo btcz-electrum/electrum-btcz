@@ -43,6 +43,7 @@ hiddenimports += [
 
 datas = [
     ('lib/servers.json', 'electrum_zcash'),
+    ('lib/checkpoints.json', 'electrum_zcash'),    
     ('lib/servers_testnet.json', 'electrum_zcash'),
     ('lib/servers_regtest.json', 'electrum_zcash'),
     ('lib/currencies.json', 'electrum_zcash'),

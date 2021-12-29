@@ -71,6 +71,7 @@ setup(
     package_data={
         'electrum_zcash': [
             'servers.json',
+            'checkpoints.json',
             'servers_testnet.json',
             'servers_regtest.json',
             'currencies.json',
