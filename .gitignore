@@ -25,3 +25,4 @@ electrum_btcz/gui/kivy/theming/light-0.png
 electrum_btcz/gui/kivy/theming/light-1.png
 electrum_btcz/gui/kivy/theming/light.atlas
 *.egg-info/
+electrum_btcz/libsecp256k1*
