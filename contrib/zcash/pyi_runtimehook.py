@@ -3,7 +3,7 @@
 import pkgutil
 
 
-PLUGINS_PREFIX = 'electrum_zcash.plugins'
+PLUGINS_PREFIX = 'electrum_btcz.plugins'
 
 KEYSTORE_PLUGINS = [
     'hw_wallet',

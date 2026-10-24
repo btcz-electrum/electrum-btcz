@@ -1,4 +1,4 @@
-# Specific of using Zcash Electrum on various operating systems
+# Specific of using BitcoinZ Electrum on various operating systems
 
 ## macOS
 

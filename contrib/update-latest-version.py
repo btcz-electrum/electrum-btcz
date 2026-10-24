@@ -19,21 +19,21 @@ except ImportError as e:
     sys.exit(1)
 
 try:
-    imp.load_module('electrum_zcash', *imp.find_module('../electrum_zcash'))
-    from electrum_zcash import constants, keystore, storage, SimpleConfig
-    from electrum_zcash.version import ELECTRUM_VERSION
-    from electrum_zcash.gui.qt import update_checker
-    from electrum_zcash.plugin import Plugins
-    from electrum_zcash.storage import WalletStorage
-    from electrum_zcash.util import InvalidPassword
-    from electrum_zcash.wallet import Wallet
-    from electrum_zcash.wallet_db import WalletDB
+    imp.load_module('electrum_btcz', *imp.find_module('../electrum_btcz'))
+    from electrum_btcz import constants, keystore, storage, SimpleConfig
+    from electrum_btcz.version import ELECTRUM_VERSION
+    from electrum_btcz.gui.qt import update_checker
+    from electrum_btcz.plugin import Plugins
+    from electrum_btcz.storage import WalletStorage
+    from electrum_btcz.util import InvalidPassword
+    from electrum_btcz.wallet import Wallet
+    from electrum_btcz.wallet_db import WalletDB
 except ImportError as e:
     print('Import error:', e)
 
 
 HOME_DIR = os.path.expanduser('~')
-CONFIG_NAME = '.update-last-version-zcash-electrum'
+CONFIG_NAME = '.update-last-version-btcz-electrum'
 SIGNING_KEYS = update_checker.UpdateCheck.VERSION_ANNOUNCEMENT_SIGNING_KEYS
 LATEST_VER_FNAME = '.latest-version'
 COMMIT_MSG_TEMPLATE = 'set {fname} to {version}'

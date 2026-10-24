@@ -5,7 +5,7 @@ set -e
 CONTRIB_ANDROID="$(dirname "$(readlink -e "$0")")"
 ROOT_FOLDER="$CONTRIB_ANDROID"/../..
 PACKAGES="$ROOT_FOLDER"/packages/
-LOCALE="$ROOT_FOLDER"/electrum_zcash/locale/
+LOCALE="$ROOT_FOLDER"/electrum_btcz/locale/
 
 if [ ! -d "$LOCALE" ]; then
   echo "Run make_locale first!"

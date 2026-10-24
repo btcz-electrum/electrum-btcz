@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./contrib/zcash/electrum_zcash_version_env.sh;
+source ./contrib/zcash/electrum_btcz_version_env.sh;
 echo wine build version is $ZCASH_ELECTRUM_VERSION
 
 mv $BUILD_DIR/zbarw $WINEPREFIX/drive_c/
@@ -9,10 +9,10 @@ mv $BUILD_DIR/x11_hash $WINEPREFIX/drive_c/
 
 mv $BUILD_DIR/libsecp256k1 $WINEPREFIX/drive_c/
 
-cd $WINEPREFIX/drive_c/electrum-zcash
+cd $WINEPREFIX/drive_c/electrum-btcz
 
 rm -rf build
-rm -rf dist/electrum-zcash
+rm -rf dist/electrum-btcz
 
 cp contrib/build-wine/deterministic.spec .
 cp contrib/zcash/pyi_runtimehook.py .
@@ -31,7 +31,7 @@ wine python -m pip install --no-dependencies --no-warn-script-location \
     -r contrib/deterministic-build/requirements-build-wine.txt
 
 wine pyinstaller --clean -y \
-    --name electrum-zcash-$ZCASH_ELECTRUM_VERSION.exe \
+    --name electrum-btcz-$ZCASH_ELECTRUM_VERSION.exe \
     deterministic.spec
 
 if [[ $WINEARCH == win32 ]]; then
@@ -43,4 +43,4 @@ fi
 wine "$NSIS_EXE" /NOCD -V3 \
     /DPRODUCT_VERSION=$ZCASH_ELECTRUM_VERSION \
     /DWINEARCH=$WINEARCH \
-    contrib/build-wine/electrum-zcash.nsi
+    contrib/build-wine/electrum-btcz.nsi

@@ -78,7 +78,7 @@ docker run --rm \
     -e PYHOME=$PYHOME \
     -e BUILD_DIR=$BUILD_DIR \
     -v $(pwd):$BUILD_DIR \
-    -v $(pwd):$WINEPREFIX/drive_c/electrum-zcash \
+    -v $(pwd):$WINEPREFIX/drive_c/electrum-btcz \
     -w $BUILD_DIR \
     -t zebralucky/electrum-dash-winebuild:Wine41x \
     $BUILD_DIR/contrib/build-wine/build.sh
@@ -132,7 +132,7 @@ docker run --rm \
     -e PYHOME=$PYHOME \
     -e BUILD_DIR=$BUILD_DIR \
     -v $(pwd):$BUILD_DIR \
-    -v $(pwd):$WINEPREFIX/drive_c/electrum-zcash \
+    -v $(pwd):$WINEPREFIX/drive_c/electrum-btcz \
     -w $BUILD_DIR \
     -t zebralucky/electrum-dash-winebuild:Wine41x \
     $BUILD_DIR/contrib/build-wine/build.sh

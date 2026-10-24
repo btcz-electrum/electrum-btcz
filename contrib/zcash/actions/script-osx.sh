@@ -52,9 +52,9 @@ cp contrib/zcash/pyi_tctl_runtimehook.py .
 
 pyinstaller --clean \
     -y \
-    --name electrum-zcash-$ZCASH_ELECTRUM_VERSION.bin \
+    --name electrum-btcz-$ZCASH_ELECTRUM_VERSION.bin \
     osx.spec
 
-sudo hdiutil create -fs HFS+ -volname "Zcash Electrum" \
-    -srcfolder dist/Zcash\ Electrum.app \
-    dist/Zcash-Electrum-$ZCASH_ELECTRUM_VERSION-macosx.dmg
+sudo hdiutil create -fs HFS+ -volname "BitcoinZ Electrum" \
+    -srcfolder dist/BitcoinZ\ Electrum.app \
+    dist/BTCZ-Electrum-$ZCASH_ELECTRUM_VERSION-macosx.dmg

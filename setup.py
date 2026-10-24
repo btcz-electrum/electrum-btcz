@@ -17,7 +17,7 @@ _min_python_version_tuple = tuple(map(int, (MIN_PYTHON_VERSION.split("."))))
 
 
 if sys.version_info[:3] < _min_python_version_tuple:
-    sys.exit("Error: Zcash Electrum requires Python version >= %s..." % MIN_PYTHON_VERSION)
+    sys.exit("Error: BitcoinZ Electrum requires Python version >= %s..." % MIN_PYTHON_VERSION)
 
 with open('contrib/requirements/requirements.txt') as f:
     requirements = f.read().splitlines()
@@ -26,7 +26,7 @@ with open('contrib/requirements/requirements-hw.txt') as f:
     requirements_hw = f.read().splitlines()
 
 # load version.py; needlessly complicated alternative to "imp.load_source":
-version_spec = importlib.util.spec_from_file_location('version', 'electrum_zcash/version.py')
+version_spec = importlib.util.spec_from_file_location('version', 'electrum_btcz/version.py')
 version_module = version = importlib.util.module_from_spec(version_spec)
 version_spec.loader.exec_module(version_module)
 
@@ -46,8 +46,8 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
         else:
             usr_share = os.path.expanduser('~/.local/share')
     data_files += [
-        (os.path.join(usr_share, 'applications/'), ['electrum-zcash.desktop']),
-        (os.path.join(usr_share, icons_dirname), ['electrum_zcash/gui/icons/electrum-zcash.png']),
+        (os.path.join(usr_share, 'applications/'), ['electrum-btcz.desktop']),
+        (os.path.join(usr_share, icons_dirname), ['electrum_btcz/gui/icons/electrum-btcz.png']),
     ]
 
 extras_require = {
@@ -65,30 +65,30 @@ extras_require['fast'] = extras_require['crypto']
 
 
 setup(
-    name="Zcash-Electrum",
+    name="BTCZ-Electrum",
     version=version.ELECTRUM_VERSION,
     python_requires='>={}'.format(MIN_PYTHON_VERSION),
     install_requires=requirements,
     extras_require=extras_require,
     packages=[
-        'electrum_zcash',
-        'electrum_zcash.gui',
-        'electrum_zcash.gui.qt',
-        'electrum_zcash.plugins',
-    ] + [('electrum_zcash.plugins.'+pkg) for pkg in find_packages('electrum_zcash/plugins')],
+        'electrum_btcz',
+        'electrum_btcz.gui',
+        'electrum_btcz.gui.qt',
+        'electrum_btcz.plugins',
+    ] + [('electrum_btcz.plugins.'+pkg) for pkg in find_packages('electrum_btcz/plugins')],
     package_dir={
-        'electrum_zcash': 'electrum_zcash'
+        'electrum_btcz': 'electrum_btcz'
     },
     # Note: MANIFEST.in lists what gets included in the tar.gz, and the
     # package_data kwarg lists what gets put in site-packages when pip installing the tar.gz.
     # By specifying include_package_data=True, MANIFEST.in becomes responsible for both.
     include_package_data=True,
-    scripts=['electrum_zcash/electrum-zcash'],
+    scripts=['electrum_btcz/electrum-btcz'],
     data_files=data_files,
-    description="Lightweight Zcash Wallet",
+    description="Lightweight BitcoinZ Wallet",
     maintainer="zebra-lucky",
     maintainer_email="zebra.lucky@gmail.com",
     license="MIT License",
-    url="https://github.com/zebra-lucky/electrum-zcash",
-    long_description="""Lightweight Zcash Wallet""",
+    url="https://github.com/btcz-electrum/electrum-btcz",
+    long_description="""Lightweight BitcoinZ Wallet""",
 )

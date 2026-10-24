@@ -4,7 +4,7 @@
 .DS_Store
 build/
 dist/
-electrum_zcash/locale/
+electrum_btcz/locale/
 .devlocaltmp/
 *_trial_temp
 packages
@@ -21,7 +21,7 @@ bin/
 .coverage
 
 electrum_data/
-electrum_zcash/gui/kivy/theming/light-0.png
-electrum_zcash/gui/kivy/theming/light-1.png
-electrum_zcash/gui/kivy/theming/light.atlas
+electrum_btcz/gui/kivy/theming/light-0.png
+electrum_btcz/gui/kivy/theming/light-1.png
+electrum_btcz/gui/kivy/theming/light.atlas
 *.egg-info/

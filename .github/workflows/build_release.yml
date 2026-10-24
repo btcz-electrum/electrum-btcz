@@ -44,7 +44,7 @@ jobs:
       - name: Set outputs for pkg_ver
         id: set_vars
         run: |
-          source ./contrib/zcash/electrum_zcash_version_env.sh
+          source ./contrib/zcash/electrum_btcz_version_env.sh
           echo "::set-output name=pkg_ver::$(echo $ZCASH_ELECTRUM_VERSION)"
       - name: Prepare build
         env:
@@ -62,8 +62,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: dist/Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-macosx.dmg
-          asset_name: Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-macosx.dmg
+          asset_path: dist/BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-macosx.dmg
+          asset_name: BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-macosx.dmg
           asset_content_type: application/apple-diskimage
 
 #  build_apk:
@@ -84,7 +84,7 @@ jobs:
 #      - name: Set outputs for pkg_ver, apk_ver, vercode, is_release
 #        id: set_vars
 #        run: |
-#          source ./contrib/zcash/electrum_zcash_version_env.sh
+#          source ./contrib/zcash/electrum_btcz_version_env.sh
 #          echo "::set-output name=pkg_ver::$(echo $ZCASH_ELECTRUM_VERSION)"
 #          echo "::set-output name=apk_ver::$(echo $ZCASH_ELECTRUM_APK_VERSION)"
 #          echo "::set-output name=vercode::$(echo $ZCASH_ELECTRUM_VERSION_CODE)"
@@ -128,7 +128,7 @@ jobs:
       - name: Set outputs for pkg_ver
         id: set_vars
         run: |
-          source ./contrib/zcash/electrum_zcash_version_env.sh
+          source ./contrib/zcash/electrum_btcz_version_env.sh
           echo "::set-output name=pkg_ver::$(echo $ZCASH_ELECTRUM_VERSION)"
       - name: Prepare build
         env:
@@ -146,8 +146,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: dist/Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}.tar.gz
-          asset_name: Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}.tar.gz
+          asset_path: dist/BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}.tar.gz
+          asset_name: BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}.tar.gz
           asset_content_type: application/gzip
       - name: Upload sdist zip Release Asset
         uses: actions/upload-release-asset@v1
@@ -155,8 +155,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: dist/Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}.zip
-          asset_name: Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}.zip
+          asset_path: dist/BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}.zip
+          asset_name: BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}.zip
           asset_content_type: application/x-zip-compressed
       - name: Upload AppImage Release Asset
         uses: actions/upload-release-asset@v1
@@ -164,8 +164,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: dist/Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-x86_64.AppImage
-          asset_name: Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-x86_64.AppImage
+          asset_path: dist/BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-x86_64.AppImage
+          asset_name: BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-x86_64.AppImage
           asset_content_type: application/octet-stream
       - name: Upload Win32 Release Asset
         uses: actions/upload-release-asset@v1
@@ -173,8 +173,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: dist/Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win32.exe
-          asset_name: Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win32.exe
+          asset_path: dist/BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win32.exe
+          asset_name: BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win32.exe
           asset_content_type: application/vnd.microsoft.portable-executable
       - name: Upload Win64 Release Asset
         uses: actions/upload-release-asset@v1
@@ -182,8 +182,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: dist/Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win64.exe
-          asset_name: Zcash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win64.exe
+          asset_path: dist/BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win64.exe
+          asset_name: BTCZ-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win64.exe
           asset_content_type: application/vnd.microsoft.portable-executable
 
   upload_notify_artifact:

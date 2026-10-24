@@ -18,10 +18,10 @@ SQUASHFSKIT_COMMIT="ae0d656efa2d0df2fcac795b6823b44462f19386"
 export GCC_STRIP_BINARIES="1"
 
 pushd $PROJECT_ROOT
-source $CONTRIB/zcash/electrum_zcash_version_env.sh
+source $CONTRIB/zcash/electrum_btcz_version_env.sh
 popd
 VERSION=$ZCASH_ELECTRUM_VERSION
-APPIMAGE="$DISTDIR/Zcash-Electrum-$VERSION-x86_64.AppImage"
+APPIMAGE="$DISTDIR/BTCZ-Electrum-$VERSION-x86_64.AppImage"
 
 . "$CONTRIB"/build_tools_util.sh
 
@@ -96,8 +96,8 @@ cp "/usr/lib/x86_64-linux-gnu/libzbar.so.0" "$APPDIR/usr/lib/libzbar.so.0"
 
 
 info "desktop integration."
-cp "$PROJECT_ROOT/electrum-zcash.desktop" "$APPDIR/electrum-zcash.desktop"
-cp "$PROJECT_ROOT/electrum_zcash/gui/icons/electrum-zcash.png" "$APPDIR/electrum-zcash.png"
+cp "$PROJECT_ROOT/electrum-btcz.desktop" "$APPDIR/electrum-btcz.desktop"
+cp "$PROJECT_ROOT/electrum_btcz/gui/icons/electrum-btcz.png" "$APPDIR/electrum-btcz.png"
 
 
 # add launcher

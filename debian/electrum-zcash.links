@@ -1,3 +1,3 @@
-opt/venvs/electrum-zcash-venv/bin/electrum-zcash usr/bin/electrum-zcash
-opt/venvs/electrum-zcash-venv/share/pixmaps/electrum-zcash.png usr/share/pixmaps/electrum-zcash.png
-opt/venvs/electrum-zcash-venv/share/applications/electrum-zcash.desktop usr/share/applications/electrum-zcash.desktop
+opt/venvs/electrum-btcz-venv/bin/electrum-btcz usr/bin/electrum-btcz
+opt/venvs/electrum-btcz-venv/share/pixmaps/electrum-btcz.png usr/share/pixmaps/electrum-btcz.png
+opt/venvs/electrum-btcz-venv/share/applications/electrum-btcz.desktop usr/share/applications/electrum-btcz.desktop

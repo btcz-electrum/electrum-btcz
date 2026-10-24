@@ -1,4 +1,4 @@
-Zcash Electrum - Lightweight Zcash client
+BitcoinZ Electrum - Lightweight BitcoinZ client
 =====================================
 
 ::
@@ -6,7 +6,7 @@ Zcash Electrum - Lightweight Zcash client
   Licence: MIT Licence
   Author: Thomas Voegtlin
   Language: Python (>= 3.6)
-  Homepage: https://github.com/zebra-lucky/electrum-zcash
+  Homepage: https://github.com/btcz-electrum/electrum-btcz
 
 
 
@@ -20,23 +20,23 @@ Getting started
 Use PPA setup
 -------------
 
-On Ubuntu/Linux Mint you can try to install Zcash Electrum with next commands::
+On Ubuntu/Linux Mint you can try to install BitcoinZ Electrum with next commands::
 
-    sudo add-apt-repository ppa:zebra-lucky/zcash-electrum
+    sudo add-apt-repository ppa:zebra-lucky/btcz-electrum
     sudo apt-get update
-    sudo apt-get install zcash-electrum
+    sudo apt-get install btcz-electrum
 
 
 Use source distribution
 -----------------------
 
-Zcash Electrum is a pure python application. If you want to use the
+BitcoinZ Electrum is a pure python application. If you want to use the
 Qt interface, install the Qt dependencies::
 
     sudo apt-get install python3-pyqt5
 
 If you downloaded the official package (tar.gz), you can run
-Zcash Electrum from its root directory without installing it on your
+BitcoinZ Electrum from its root directory without installing it on your
 system; all the python dependencies are included in the 'packages'
 directory (except x11-hash).
 
@@ -52,29 +52,29 @@ To install precise tested version of pyqt5 run once::
 
     python3 -m pip install -t packages -r contrib/deterministic-build/requirements-binaries.txt
 
-To run Zcash Electrum from its root directory, just do::
+To run BitcoinZ Electrum from its root directory, just do::
 
-    ./electrum-zcash
+    ./electrum-btcz
 
-You can also install Zcash Electrum on your system, by running this command::
+You can also install BitcoinZ Electrum on your system, by running this command::
 
     sudo apt-get install python3-setuptools
     python3 -m pip install .[fast]
 
 This will download and install the Python dependencies used by
-Zcash Electrum instead of using the 'packages' directory.
+BitcoinZ Electrum instead of using the 'packages' directory.
 The 'fast' extra contains some optional dependencies that we think
 are often useful but they are not strictly needed.
 
 If you cloned the git repository, you need to compile extra files
-before you can run Zcash Electrum. Read the next section, "Development
+before you can run BitcoinZ Electrum. Read the next section, "Development
 Version".
 
 
 Using Tor proxy
 ===============
 
-Starting from Zcash Electrum release 3.2.3.1 automatic Tor Proxy
+Starting from BitcoinZ Electrum release 3.2.3.1 automatic Tor Proxy
 detection and use on wallet startup is added to
 `Network <docs/tor/tor-proxy-on-startup.md>`_ preferences.
 
@@ -90,8 +90,8 @@ Development version
 
 Check out the code from GitHub::
 
-    git clone https://github.com/zebra-lucky/electrum-zcash.git
-    cd electrum-zcash
+    git clone https://github.com/btcz-electrum/electrum-btcz.git
+    cd electrum-btcz
 
 Run install (this should install dependencies)::
 
@@ -101,7 +101,7 @@ Run install (this should install dependencies)::
 Compile the protobuf description file::
 
     sudo apt-get install protobuf-compiler
-    protoc --proto_path=electrum_zcash --python_out=electrum_zcash electrum_zcash/paymentrequest.proto
+    protoc --proto_path=electrum_btcz --python_out=electrum_btcz electrum_btcz/paymentrequest.proto
 
 Create translations (optional)::
 

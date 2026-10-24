@@ -15,7 +15,7 @@ else:
 
 GITHUB_REF = os.environ.get('GITHUB_REF')
 ZCASH_ELECTRUM_VERSION = os.environ.get('ZCASH_ELECTRUM_VERSION')
-ICONS_FILE = 'electrum_zcash/gui/icons/electrum-zcash.icns'
+ICONS_FILE = 'electrum_btcz/gui/icons/electrum-btcz.icns'
 
 hiddenimports = []
 hiddenimports += collect_submodules('pkg_resources')  # workaround for https://github.com/pypa/setuptools/issues/1963
@@ -30,41 +30,41 @@ hiddenimports += collect_submodules('websocket')
 hiddenimports.remove('safetlib.qt.pinmatrix')
 
 hiddenimports += [
-    'electrum_zcash',
-    'electrum_zcash.base_crash_reporter',
-    'electrum_zcash.base_wizard',
-    'electrum_zcash.plot',
-    'electrum_zcash.qrscanner',
-    'electrum_zcash.websockets',
-    'electrum_zcash.gui.qt',
+    'electrum_btcz',
+    'electrum_btcz.base_crash_reporter',
+    'electrum_btcz.base_wizard',
+    'electrum_btcz.plot',
+    'electrum_btcz.qrscanner',
+    'electrum_btcz.websockets',
+    'electrum_btcz.gui.qt',
     'PyQt5.sip',
     'PyQt5.QtPrintSupport',  # needed by Revealer
 
-    'electrum_zcash.plugins',
+    'electrum_btcz.plugins',
 
-    'electrum_zcash.plugins.hw_wallet.qt',
+    'electrum_btcz.plugins.hw_wallet.qt',
 
-    'electrum_zcash.plugins.audio_modem.qt',
-    'electrum_zcash.plugins.cosigner_pool.qt',
-    'electrum_zcash.plugins.digitalbitbox.qt',
-    'electrum_zcash.plugins.email_requests.qt',
-    'electrum_zcash.plugins.keepkey.qt',
-    'electrum_zcash.plugins.revealer.qt',
-    'electrum_zcash.plugins.labels.qt',
-    'electrum_zcash.plugins.scan_over_gap.qt',
-    'electrum_zcash.plugins.trezor.qt',
-    'electrum_zcash.plugins.safe_t.client',
-    'electrum_zcash.plugins.safe_t.qt',
-    'electrum_zcash.plugins.ledger.qt',
-    'electrum_zcash.plugins.virtualkeyboard.qt',
+    'electrum_btcz.plugins.audio_modem.qt',
+    'electrum_btcz.plugins.cosigner_pool.qt',
+    'electrum_btcz.plugins.digitalbitbox.qt',
+    'electrum_btcz.plugins.email_requests.qt',
+    'electrum_btcz.plugins.keepkey.qt',
+    'electrum_btcz.plugins.revealer.qt',
+    'electrum_btcz.plugins.labels.qt',
+    'electrum_btcz.plugins.scan_over_gap.qt',
+    'electrum_btcz.plugins.trezor.qt',
+    'electrum_btcz.plugins.safe_t.client',
+    'electrum_btcz.plugins.safe_t.qt',
+    'electrum_btcz.plugins.ledger.qt',
+    'electrum_btcz.plugins.virtualkeyboard.qt',
 ]
 
 datas = [
-#    ('electrum_zcash/checkpoints*.*', 'electrum_zcash'),
-    ('electrum_zcash/*.json', 'electrum_zcash'),
-    ('electrum_zcash/locale', 'electrum_zcash/locale'),
-    ('electrum_zcash/wordlist', 'electrum_zcash/wordlist'),
-    ('electrum_zcash/gui/icons', 'electrum_zcash/gui/icons'),
+#    ('electrum_btcz/checkpoints*.*', 'electrum_btcz'),
+    ('electrum_btcz/*.json', 'electrum_btcz'),
+    ('electrum_btcz/locale', 'electrum_btcz/locale'),
+    ('electrum_btcz/wordlist', 'electrum_btcz/wordlist'),
+    ('electrum_btcz/gui/icons', 'electrum_btcz/gui/icons'),
 ]
 
 datas += collect_data_files('trezorlib')
@@ -130,7 +130,7 @@ excludes += [
     'PyQt5.QtWinExtras',
 ]
 
-a = Analysis(['electrum-zcash'],
+a = Analysis(['electrum-btcz'],
              hiddenimports=hiddenimports,
              datas=datas,
              binaries=binaries,
@@ -161,15 +161,15 @@ exe = EXE(pyz,
           strip=False,
           upx=False,
           console=False,
-          icon='electrum_zcash/gui/icons/electrum-zcash.ico',
-          name=os.path.join('electrum-zcash', cmdline_name))
+          icon='electrum_btcz/gui/icons/electrum-btcz.ico',
+          name=os.path.join('electrum-btcz', cmdline_name))
 
 coll = COLLECT(exe,
                a.binaries,
                a.datas,
                strip=False,
                upx=False,
-               name=os.path.join('dist', 'electrum-zcash'))
+               name=os.path.join('dist', 'electrum-btcz'))
 
 app = BUNDLE(coll,
              info_plist={
@@ -179,7 +179,7 @@ app = BUNDLE(coll,
                     {'CFBundleURLName': 'zcash', 'CFBundleURLSchemes': ['zcash']}
                 ],
              },
-             name=os.path.join('dist', 'Zcash Electrum.app'),
-             appname="Zcash Electrum",
+             name=os.path.join('dist', 'BitcoinZ Electrum.app'),
+             appname="BitcoinZ Electrum",
 	         icon=ICONS_FILE,
              version=ZCASH_ELECTRUM_VERSION)

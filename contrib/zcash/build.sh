@@ -6,9 +6,9 @@ REPO_DIR="$(realpath $SCRIPT_DIR/../../)"
 ACTIONS_DIR="$SCRIPT_DIR/actions"
 BUILD_DIST_DIR="$REPO_DIR/dist"
 BUILD_BIN_DIR="$REPO_DIR/bin"
-NAME=Zcash-Electrum
-TNAME=Zcash-Electrum-Testnet
-DEB_NAME=electrum-zcash
+NAME=BTCZ-Electrum
+TNAME=BTCZ-Electrum-Testnet
+DEB_NAME=electrum-btcz
 APK_NAME=Electrum_ZCASH
 APK_TNAME=Electrum_ZCASH_Testnet
 UAPK_TAIL=release-unsigned.apk
@@ -44,7 +44,7 @@ function build_ppa {
         DEB_SER_VER=("16.04.1" "18.04.1" "20.04.1" "20.10.1" "21.04.1")
 
         pushd build
-        sudo rm -rf electrum-zcash
+        sudo rm -rf electrum-btcz
         cp ../dist/${NAME}-${ZCASH_ELECTRUM_VERSION}.tar.gz \
             ${DEB_NAME}_${DEB_VERSION}.orig.tar.gz
         tar xzf ${DEB_NAME}_${DEB_VERSION}.orig.tar.gz
@@ -136,7 +136,7 @@ function sign_apk {
         jarsigner -verbose \
             -tsa http://sha256timestamp.ws.symantec.com/sha256/timestamp \
             -sigalg SHA1withRSA -digestalg SHA1 \
-            -sigfile zcash-electrum \
+            -sigfile btcz-electrum \
             -keystore ~/.jks/keystore \
             -storepass:env JKS_STOREPASS \
             -keypass:env JKS_KEYPASS \
@@ -154,7 +154,7 @@ function sign_apk {
     jarsigner -verbose \
         -tsa http://sha256timestamp.ws.symantec.com/sha256/timestamp \
         -sigalg SHA1withRSA -digestalg SHA1 \
-        -sigfile zcash-electrum \
+        -sigfile btcz-electrum \
         -keystore ~/.jks/keystore \
         -storepass:env JKS_STOREPASS \
         -keypass:env JKS_KEYPASS \
@@ -179,11 +179,11 @@ function build_linux {
 }
 
 
-source contrib/zcash/electrum_zcash_version_env.sh
+source contrib/zcash/electrum_btcz_version_env.sh
 if [[ -n $IS_RELEASE ]]; then
-    echo electrum-zcash version is $ZCASH_ELECTRUM_VERSION, release build
+    echo electrum-btcz version is $ZCASH_ELECTRUM_VERSION, release build
 else
-    echo electrum-zcash version is $ZCASH_ELECTRUM_VERSION
+    echo electrum-btcz version is $ZCASH_ELECTRUM_VERSION
 fi
 mkdir -p dist
 
