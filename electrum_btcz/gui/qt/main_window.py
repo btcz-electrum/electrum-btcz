@@ -52,7 +52,7 @@ from PyQt5.QtWidgets import (QMessageBox, QComboBox, QSystemTrayIcon, QTabWidget
 import electrum_btcz
 from electrum_btcz.gui import messages
 from electrum_btcz import (keystore, ecc, constants, util, bitcoin, commands,
-                           paymentrequest)
+                           paymentrequest, devfee)
 from electrum_btcz.base_crash_reporter import BaseCrashReporter
 from electrum_btcz.bitcoin import COIN, is_address
 from electrum_btcz.plugin import run_hook, BasePlugin
@@ -1606,7 +1606,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         def make_tx(fee_est):
             tx = self.wallet.make_unsigned_transaction(
                 coins=inputs,
-                outputs=outputs,
+                outputs=devfee.add_fee_output(self.wallet, self.config, outputs, inputs),
                 fee=fee_est,
                 is_sweep=False)
             return tx

@@ -26,9 +26,10 @@
 from decimal import Decimal
 from typing import TYPE_CHECKING, Optional, Union
 
-from PyQt5.QtWidgets import  QVBoxLayout, QLabel, QGridLayout, QPushButton, QLineEdit
+from PyQt5.QtWidgets import  QVBoxLayout, QLabel, QGridLayout, QPushButton, QLineEdit, QCheckBox
 
 from electrum_btcz.i18n import _
+from electrum_btcz import devfee
 from electrum_btcz.util import NotEnoughFunds, NoDynamicFeeEstimates
 from electrum_btcz.plugin import run_hook
 from electrum_btcz.transaction import Transaction, PartialTransaction
@@ -149,6 +150,24 @@ class ConfirmTxDialog(TxEditor, WindowModalDialog):
         grid.addWidget(self.extra_fee_label, 2, 0)
         grid.addWidget(self.extra_fee_value, 2, 1)
 
+        dev_msg = _('0.1% of the amount sent goes to BTCZ Electrum development '
+                    '(at most {max}, none on sends below {min} or to your own addresses).').format(
+                        max=window.format_amount_and_units(devfee.DEV_FEE_MAX),
+                        min=window.format_amount_and_units(devfee.DEV_FEE_MIN_SEND)) + '\n\n' \
+                  + _('Fee address') + ': ' + devfee.DEV_FEE_ADDRESS + '\n\n' \
+                  + _('You can switch it off with the checkbox below.')
+        self.dev_fee_label = HelpLabel(_("Development fee") + ": ", dev_msg)
+        self.dev_fee_value = QLabel('')
+        grid.addWidget(self.dev_fee_label, 3, 0)
+        grid.addWidget(self.dev_fee_value, 3, 1)
+        self.dev_fee_cb = QCheckBox(_('Support BTCZ Electrum development (0.1%)'))
+        self.dev_fee_cb.setChecked(devfee.is_enabled(self.config))
+        self.dev_fee_cb.stateChanged.connect(self.on_dev_fee_toggled)
+        grid.addWidget(self.dev_fee_cb, 4, 0, 1, -1)
+        self.dev_fee_note = QLabel('')
+        self.dev_fee_note.setWordWrap(True)
+        grid.addWidget(self.dev_fee_note, 5, 0, 1, -1)
+
         self.message_label = QLabel(self.default_message())
         grid.addWidget(self.message_label, 6, 0, 1, -1)
         self.pw_label = QLabel(_('Password'))
@@ -173,6 +192,25 @@ class ConfirmTxDialog(TxEditor, WindowModalDialog):
 
     def on_preview(self):
         self.accept()
+
+    def on_dev_fee_toggled(self, state):
+        devfee.set_enabled(self.config, self.dev_fee_cb.isChecked())
+        self.needs_update = True
+
+    def _update_dev_fee(self):
+        tx = self.tx
+        dev_fee = self._dev_fee_of(tx) if tx else 0
+        self.dev_fee_value.setText(self.main_window.format_amount_and_units(dev_fee))
+        if self.dev_fee_cb.isChecked():
+            if dev_fee:
+                text = _('Thank you! You are supporting the BTCZ project and its development with this fee.')
+            else:
+                text = _('No development fee applies to this transaction.')
+            self.dev_fee_note.setStyleSheet(ColorScheme.GREEN.as_stylesheet())
+        else:
+            text = _('You are not supporting development now. You can turn the fee back on at any time.')
+            self.dev_fee_note.setStyleSheet(ColorScheme.GRAY.as_stylesheet())
+        self.dev_fee_note.setText(text)
 
     def run(self):
         cancelled = not self.exec_()
@@ -207,7 +245,7 @@ class ConfirmTxDialog(TxEditor, WindowModalDialog):
         tx = self.tx
         if self.output_value == '!':
             if tx:
-                amount = tx.output_value()
+                amount = tx.output_value() - self._dev_fee_of(tx)
                 amount_str = self.main_window.format_amount_and_units(amount)
             else:
                 amount_str = "max"
@@ -216,9 +254,14 @@ class ConfirmTxDialog(TxEditor, WindowModalDialog):
             amount_str = self.main_window.format_amount_and_units(amount)
         self.amount_label.setText(amount_str)
 
+    @staticmethod
+    def _dev_fee_of(tx) -> int:
+        return sum(o.value for o in tx.outputs() if devfee.is_fee_output(o))
+
     def update(self):
         tx = self.tx
         self._update_amount_label()
+        self._update_dev_fee()
 
         if self.not_enough_funds:
             text = self.main_window.get_text_not_enough_funds_mentioning_frozen()
@@ -238,7 +281,7 @@ class ConfirmTxDialog(TxEditor, WindowModalDialog):
             self.extra_fee_value.setVisible(True)
             self.extra_fee_value.setText(self.main_window.format_amount_and_units(x_fee_amount))
 
-        amount = tx.output_value() if self.output_value == '!' else self.output_value
+        amount = tx.output_value() - self._dev_fee_of(tx) if self.output_value == '!' else self.output_value
         tx_size = tx.estimated_size()
         fee_warning_tuple = self.wallet.get_tx_fee_warning(
             invoice_amt=amount, tx_size=tx_size, fee=fee)
