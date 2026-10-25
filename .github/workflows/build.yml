@@ -95,7 +95,7 @@ jobs:
         run: |
           mkdir -p electrum_btcz/locale
           venv/bin/pyinstaller --clean -y osx.spec
-          "dist/BitcoinZ Electrum.app/Contents/MacOS/electrum-btcz-$ZCASH_ELECTRUM_VERSION.bin" version
+          "dist/BitcoinZ Electrum.app/Contents/MacOS/electrum-btcz-$ZCASH_ELECTRUM_VERSION.bin" --offline version
           mkdir -p out
           hdiutil create -quiet -fs HFS+ -volname "BitcoinZ Electrum" -srcfolder "dist/BitcoinZ Electrum.app" \
             "out/BTCZ-Electrum-$ZCASH_ELECTRUM_VERSION-macos-${{ matrix.arch }}.dmg"
