@@ -73,7 +73,7 @@ datas += collect_data_files('btchip')
 datas += collect_data_files('keepkeylib')
 
 # Add the QR Scanner helper app
-if GITHUB_REF:
+if GITHUB_REF and os.path.exists('contrib/CalinsQRReader/build/Release/CalinsQRReader.app'):
     QRREADER_ZPATH = 'contrib/CalinsQRReader/build/Release/CalinsQRReader.app'
     QRREADER_PATH = './contrib/CalinsQRReader/build/Release/CalinsQRReader.app'
     datas += [(QRREADER_ZPATH, QRREADER_PATH)]
@@ -89,6 +89,8 @@ binaries += [b for b in collect_dynamic_libs('PyQt5') if 'macstyle' in b[0]]
 # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-remove-tkinter-tcl
 sys.modules['FixTk'] = None
 excludes = ['FixTk', 'tcl', 'tk', '_tkinter', 'tkinter', 'Tkinter']
+# the Android (kivy) GUI exits on import when kivy is missing
+excludes += ['electrum_btcz.gui.kivy', 'kivy']
 excludes += [
     'PyQt5.QtBluetooth',
     'PyQt5.QtCLucene',

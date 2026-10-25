@@ -80,6 +80,8 @@ binaries += [b for b in collect_dynamic_libs('PyQt5') if 'qwindowsvista' in b[0]
 # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-remove-tkinter-tcl
 sys.modules['FixTk'] = None
 excludes = ['FixTk', 'tcl', 'tk', '_tkinter', 'tkinter', 'Tkinter']
+# the Android (kivy) GUI exits on import when kivy is missing
+excludes += ['electrum_btcz.gui.kivy', 'kivy']
 excludes += [
     'PyQt5.QtBluetooth',
     'PyQt5.QtCLucene',
