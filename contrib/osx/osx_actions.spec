@@ -11,7 +11,7 @@ for i, x in enumerate(sys.argv):
         cmdline_name = sys.argv[i+1]
         break
 else:
-    raise Exception('no name')
+    cmdline_name = 'electrum-btcz-%s.bin' % os.environ.get('ZCASH_ELECTRUM_VERSION', '')
 
 GITHUB_REF = os.environ.get('GITHUB_REF')
 ZCASH_ELECTRUM_VERSION = os.environ.get('ZCASH_ELECTRUM_VERSION')
@@ -27,7 +27,7 @@ hiddenimports += collect_submodules('websocket')
 
 # safetlib imports PyQt5.Qt.  We use a local updated copy of pinmatrix.py until they
 # release a new version that includes https://github.com/archos-safe-t/python-safet/commit/b1eab3dba4c04fdfc1fcf17b66662c28c5f2380e
-hiddenimports.remove('safetlib.qt.pinmatrix')
+if 'safetlib.qt.pinmatrix' in hiddenimports: hiddenimports.remove('safetlib.qt.pinmatrix')
 
 hiddenimports += [
     'electrum_btcz',
@@ -60,7 +60,7 @@ hiddenimports += [
 ]
 
 datas = [
-#    ('electrum_btcz/checkpoints*.*', 'electrum_btcz'),
+    ('electrum_btcz/checkpoints*.*', 'electrum_btcz'),
     ('electrum_btcz/*.json', 'electrum_btcz'),
     ('electrum_btcz/locale', 'electrum_btcz/locale'),
     ('electrum_btcz/wordlist', 'electrum_btcz/wordlist'),
@@ -80,9 +80,8 @@ if GITHUB_REF:
 
 # Add libusb so Trezor and Safe-T mini will work
 binaries = []
-binaries += [('libusb-1.0.dylib', '.')]
-binaries += [('libsecp256k1.0.dylib', '.')]
-binaries += [('libgmp.10.dylib', '.')]  # need by libsecp256k1.0.dylib
+binaries += [(f, '.') for f in ('libusb-1.0.dylib', 'libgmp.10.dylib') if os.path.exists(f)]
+binaries += [('electrum_btcz/libsecp256k1.0.dylib', '.')]
 
 # Workaround for "Retro Look":
 binaries += [b for b in collect_dynamic_libs('PyQt5') if 'macstyle' in b[0]]
@@ -176,7 +175,7 @@ app = BUNDLE(coll,
                 'NSHighResolutionCapable': True,
                 'NSSupportsAutomaticGraphicsSwitching': True,
                 'CFBundleURLTypes': [
-                    {'CFBundleURLName': 'zcash', 'CFBundleURLSchemes': ['zcash']}
+                    {'CFBundleURLName': 'bitcoinz', 'CFBundleURLSchemes': ['bitcoinz']}
                 ],
              },
              name=os.path.join('dist', 'BitcoinZ Electrum.app'),
