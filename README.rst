@@ -1,6 +1,24 @@
 BitcoinZ Electrum - Lightweight BitcoinZ client
 =====================================
 
+**Version 4.1.2.2 (testing)** - port of Electrum-Zcash 4.1.2 to BitcoinZ.
+
+- Signs transactions with the Canopy rules (active on BitcoinZ since block 1,735,000);
+  the old 3.1.3 client can no longer send.
+- Servers: electrum1/electrum2/electrum6.btcz.rocks; checkpoints up to block 1,861,199.
+- Builds: Windows ``.exe``, macOS ``.dmg`` (Apple Silicon and Intel) and source ``.tar.gz``
+  are built by GitHub Actions (``.github/workflows/build.yml``) and attached to Releases.
+- Opening a 3.1.3 wallet upgrades the wallet file; back it up first.
+
+Development fee
+---------------
+
+The Confirm Transaction dialog adds an optional development fee of 0.1% of the amount sent
+(none below 100,000 BTCZ, at most 50,000 BTCZ, none on sends to your own addresses),
+paid to ``t1b3Q9vSWzJsGsayHTi9ivcrNCk8xR2Nt1M``. It is shown as its own line and can be
+switched off with the checkbox in that dialog; the choice is remembered.
+
+
 ::
 
   Licence: MIT Licence
