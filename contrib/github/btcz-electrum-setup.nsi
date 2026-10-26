@@ -16,7 +16,7 @@
 
   !define PRODUCT_NAME "BitcoinZ Electrum"
   !define PRODUCT_EXE "BTCZ-Electrum.exe"
-  !define PRODUCT_WEB_SITE "https://github.com/RokMikuz/btcz-electrum-wallet"
+  !define PRODUCT_WEB_SITE "https://github.com/btcz-electrum/electrum-btcz"
   !define PRODUCT_PUBLISHER "BitcoinZ Community"
   !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
   ; names used by older BTCZ Electrum installers

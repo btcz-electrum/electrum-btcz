@@ -19,7 +19,7 @@ from electrum_btcz.network import Network
 
 
 class UpdateCheck(QDialog, Logger):
-    url = "https://raw.githubusercontent.com/btcz-electrum/electrum-btcz/master/.latest-version"
+    url = "https://raw.githubusercontent.com/btcz-electrum/electrum-btcz/btcz/.latest-version"
     download_url = "https://github.com/btcz-electrum/electrum-btcz/releases"
 
 
