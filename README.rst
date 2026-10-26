@@ -12,9 +12,9 @@ BitcoinZ Electrum - Lightweight BitcoinZ client
 - Windows: ``BTCZ-Electrum-<version>-setup.exe`` installs to Program Files and first removes
   any older installed BTCZ Electrum (also the 3.x one); ``BTCZ-Electrum-<version>.exe`` is the
   portable single file. Neither the setup nor the uninstaller touches the wallets.
-- Windows wallets are in ``%APPDATA%\\Electrum-BTCZ`` (older versions used ``Electrum-ZCASH``).
+- Windows wallets are in ``%APPDATA%\Electrum-BTCZ`` (older versions used ``Electrum-ZCASH``).
   When ``Electrum-BTCZ`` does not exist yet it is created and the wallet files from
-  ``Electrum-ZCASH\\wallets`` are copied into it; the old folder is left unchanged.
+  ``Electrum-ZCASH\wallets`` are copied into it; the old folder is left unchanged.
 
 Development fee
 ---------------
