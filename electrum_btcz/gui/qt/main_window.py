@@ -232,9 +232,13 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
 
         tabs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
+        tabs.setIconSize(QSize(0, 0))
+
         central_widget = QWidget()
         vbox = QVBoxLayout(central_widget)
         vbox.setContentsMargins(0, 0, 0, 0)
+        vbox.setSpacing(0)
+        vbox.addWidget(self.create_header())
         vbox.addWidget(tabs)
         vbox.addWidget(coincontrol_sb)
 
@@ -938,6 +942,66 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         btc_e.textChanged.connect(partial(edit_changed, btc_e))
         fiat_e.is_last_edited = False
 
+    def create_header(self):
+        header = QWidget()
+        header.setObjectName("btcz_header")
+        header.setAttribute(Qt.WA_StyledBackground, True)
+        hbox = QHBoxLayout(header)
+        hbox.setContentsMargins(20, 14, 20, 14)
+        logo = QLabel()
+        logo.setPixmap(QPixmap(icon_path("btcz_header_logo.png")).scaled(
+            44, 44, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        hbox.addWidget(logo)
+        names = QVBoxLayout()
+        names.setSpacing(0)
+        title = QLabel("BitcoinZ")
+        title.setObjectName("btcz_header_title")
+        names.addWidget(title)
+        subtitle = QLabel(_("Electrum wallet") + " " + ELECTRUM_VERSION)
+        subtitle.setObjectName("btcz_header_subtitle")
+        names.addWidget(subtitle)
+        hbox.addSpacing(8)
+        hbox.addLayout(names)
+        hbox.addStretch(1)
+        amounts = QVBoxLayout()
+        amounts.setSpacing(0)
+        self.header_balance = QLabel("")
+        self.header_balance.setObjectName("btcz_header_balance")
+        self.header_balance.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.header_balance.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        amounts.addWidget(self.header_balance)
+        self.header_status = QLabel(_("Loading wallet..."))
+        self.header_status.setObjectName("btcz_header_status")
+        self.header_status.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        amounts.addWidget(self.header_status)
+        hbox.addLayout(amounts)
+        return header
+
+    def format_amount_grouped(self, amount_sat) -> str:
+        # 33669886.8989825 -> "33,669,886.89898" style; trailing zeros beyond 2 decimals dropped
+        s = self.format_amount(amount_sat).strip()
+        whole, _sep, frac = s.partition('.')
+        sign = '-' if whole.startswith('-') else ''
+        whole = whole.lstrip('-+')
+        frac = frac.rstrip('0')
+        frac = (frac + '00')[:max(2, len(frac))] if self.get_decimal_point() else ''
+        return sign + '{:,}'.format(int(whole or 0)) + ('.' + frac if frac else '')
+
+    def update_header(self, status_text: str):
+        c, u, x = self.wallet.get_balance()
+        self.header_balance.setText("%s %s" % (self.format_amount_grouped(c + u + x), self.base_unit()))
+        details = []
+        if u:
+            details.append(_("{} unconfirmed").format(self.format_amount_grouped(u)))
+        if x:
+            details.append(_("{} unmatured").format(self.format_amount_grouped(x)))
+        if self.fx.is_enabled():
+            fiat = self.fx.format_amount_and_units(c + u + x)
+            if fiat:
+                details.append("≈ " + fiat)
+        details.append(status_text)
+        self.header_status.setText("  ·  ".join(details))
+
     def update_status(self):
         if not self.wallet:
             return
@@ -986,7 +1050,12 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
 
         if self.tray:
             self.tray.setToolTip("%s (%s)" % (text, self.wallet.basename()))
-        self.balance_label.setText(text)
+        if self.network and self.network.is_connected() and self.wallet.up_to_date:
+            status_text = _("Synchronized") + " · " + _("block") + " {:,}".format(self.network.get_local_height())
+        else:
+            status_text = text
+        self.update_header(status_text)
+        self.balance_label.setText(status_text)
         if self.status_button:
             self.status_button.setIcon(icon)
 
@@ -1089,6 +1158,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         self.clear_invoice_button = QPushButton(_('Clear'))
         self.clear_invoice_button.clicked.connect(self.clear_receive_tab)
         self.create_invoice_button = QPushButton(_('New Address'))
+        self.create_invoice_button.setProperty("primary", True)
         self.create_invoice_button.setIcon(read_QIcon("zcashcoin.png"))
         self.create_invoice_button.setToolTip('Create on-chain request')
         self.create_invoice_button.clicked.connect(lambda: self.create_invoice())
@@ -1153,6 +1223,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         w.setObjectName("receive_container")
         w.searchable_list = self.request_list
         vbox = QVBoxLayout(w)
+        vbox.setContentsMargins(18, 16, 18, 10)
         vbox.addLayout(hbox)
 
         vbox.addStretch(1)
@@ -1342,6 +1413,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
 
         self.save_button = EnterButton(_("Save"), self.do_save_invoice)
         self.send_button = EnterButton(_("Pay") + "...", self.do_pay)
+        self.send_button.setProperty("primary", True)
         self.clear_button = EnterButton(_("Clear"), self.do_clear)
 
         buttons = QHBoxLayout()
@@ -1374,6 +1446,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         w = QWidget()
         w.setObjectName("send_container")
         vbox = QVBoxLayout(w)
+        vbox.setContentsMargins(18, 16, 18, 10)
         vbox.addLayout(hbox)
         vbox.addStretch(1)
         vbox.addWidget(self.invoices_label)

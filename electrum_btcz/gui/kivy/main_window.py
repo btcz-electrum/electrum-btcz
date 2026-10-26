@@ -134,7 +134,7 @@ class ElectrumWindow(App, Logger):
 
     tor_auto_on_bp = BooleanProperty()
     def toggle_tor_auto_on(self, x):
-        self.tor_auto_on_bp = not self.electrum_config.get('tor_auto_on', True)
+        self.tor_auto_on_bp = not self.electrum_config.get('tor_auto_on', False)
         self.electrum_config.set_key('tor_auto_on', self.tor_auto_on_bp, True)
 
     fiat_bypass_tor_bp = BooleanProperty()
@@ -377,7 +377,7 @@ class ElectrumWindow(App, Logger):
         self.electrum_config = config = kwargs.get('config', None)  # type: SimpleConfig
         self.language = config.get('language', 'en')
         self.network = network = kwargs.get('network', None)  # type: Network
-        self.tor_auto_on_bp = self.electrum_config.get('tor_auto_on', True)
+        self.tor_auto_on_bp = self.electrum_config.get('tor_auto_on', False)
         if self.network:
             self.num_blocks = self.network.get_local_height()
             self.num_nodes = len(self.network.get_interfaces())
@@ -693,7 +693,7 @@ class ElectrumWindow(App, Logger):
         def continue_load():
             self._load_wallet_by_name(path)
 
-        if (self.electrum_config.get('tor_auto_on', True)
+        if (self.electrum_config.get('tor_auto_on', False)
                 and not self.network.detect_tor_proxy()):
             TorWarnDialog(self, path, continue_load).open()
         else:

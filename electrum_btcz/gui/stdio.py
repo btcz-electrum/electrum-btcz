@@ -27,7 +27,7 @@ class ElectrumGui:
         colorama.init()
         self.config = config
         self.network = network = daemon.network
-        if config.get('tor_auto_on', True):
+        if config.get('tor_auto_on', False):
             if network:
                 proxy_modifiable = config.is_modifiable('proxy')
                 if not proxy_modifiable or not network.detect_tor_proxy():

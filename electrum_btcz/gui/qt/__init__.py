@@ -36,7 +36,7 @@ try:
 except Exception:
     sys.exit("Error: Could not import PyQt5 on Linux systems, you may try 'sudo apt-get install python3-pyqt5'")
 
-from PyQt5.QtGui import QGuiApplication
+from PyQt5.QtGui import QGuiApplication, QPalette
 from PyQt5.QtWidgets import (QApplication, QSystemTrayIcon, QWidget, QMenu,
                              QMessageBox)
 from PyQt5.QtCore import QObject, pyqtSignal, QTimer
@@ -57,6 +57,7 @@ from .util import get_default_language, read_QIcon, ColorScheme, custom_message_
 from .main_window import ElectrumWindow
 from .network_dialog import NetworkDialog
 from .stylesheet_patcher import patch_qt_stylesheet
+from . import btcz_style
 
 if TYPE_CHECKING:
     from electrum_btcz.daemon import Daemon
@@ -137,14 +138,15 @@ class ElectrumGui(Logger):
         self.tray.show()
 
     def set_dark_theme_if_needed(self):
-        use_dark_theme = self.config.get('qt_gui_color_theme', 'default') == 'dark'
-        self.app.setStyle('Fusion')
-        if use_dark_theme:
-            from .dark_zcash_style import zcash_stylesheet
-            self.app.setStyleSheet(zcash_stylesheet)
+        theme = self.config.get('qt_gui_color_theme', 'system')
+        if theme == 'system':
+            # follow the OS: its palette is still untouched at this point
+            use_dark_theme = self.app.palette().color(QPalette.Window).lightness() < 128
         else:
-            from .zcash_style import zcash_stylesheet
-            self.app.setStyleSheet(zcash_stylesheet)
+            use_dark_theme = theme == 'dark'
+        self.app.setStyle('Fusion')
+        self.app.setPalette(btcz_style.palette(use_dark_theme))
+        self.app.setStyleSheet(btcz_style.stylesheet(use_dark_theme))
         # Apply any necessary stylesheet patches
         patch_qt_stylesheet(use_dark_theme=use_dark_theme)
         # Even if we ourselves don't set the dark theme,
@@ -272,7 +274,7 @@ class ElectrumGui(Logger):
         '''Raises the window for the wallet if it is open.  Otherwise
         opens the wallet and creates a new window for it'''
         wallet = None
-        if self.config.get('tor_auto_on', True):
+        if self.config.get('tor_auto_on', False):
             network = self.daemon.network
             if network:
                 proxy_modifiable = self.config.is_modifiable('proxy')

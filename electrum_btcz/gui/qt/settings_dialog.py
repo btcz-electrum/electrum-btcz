@@ -157,9 +157,10 @@ class SettingsDialog(WindowModalDialog):
         gui_widgets.append((qr_label, qr_combo))
 
         colortheme_combo = QComboBox()
+        colortheme_combo.addItem(_('System'), 'system')
         colortheme_combo.addItem(_('Light'), 'default')
         colortheme_combo.addItem(_('Dark'), 'dark')
-        index = colortheme_combo.findData(self.config.get('qt_gui_color_theme', 'default'))
+        index = colortheme_combo.findData(self.config.get('qt_gui_color_theme', 'system'))
         colortheme_combo.setCurrentIndex(index)
         colortheme_label = QLabel(_('Color theme') + ':')
         def on_colortheme(x):

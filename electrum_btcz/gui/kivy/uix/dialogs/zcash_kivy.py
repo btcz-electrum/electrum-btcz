@@ -97,14 +97,14 @@ class TorWarnDialog(Factory.Popup):
 
         warn_lbl = self.ids.warn_lbl
         warn_lbl.text = net.TOR_WARN_MSG_KIVY
-        self.tor_auto_on_bp = self.config.get('tor_auto_on', True)
+        self.tor_auto_on_bp = self.config.get('tor_auto_on', False)
 
     def on_dismiss(self):
         if not self.can_hide:
             return True
 
     def toggle_tor_auto_on(self):
-        self.tor_auto_on_bp = not self.config.get('tor_auto_on', True)
+        self.tor_auto_on_bp = not self.config.get('tor_auto_on', False)
         self.config.set_key('tor_auto_on', self.tor_auto_on_bp, True)
 
     def continue_without_tor(self):

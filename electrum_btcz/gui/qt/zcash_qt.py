@@ -51,7 +51,7 @@ class TorWarnDialog(WindowModalDialog):
         vbox.addStretch(1)
 
         self.tor_auto_on_cb = QCheckBox(self.network.TOR_AUTO_ON_MSG)
-        self.tor_auto_on_cb.setChecked(self.config.get('tor_auto_on', True))
+        self.tor_auto_on_cb.setChecked(self.config.get('tor_auto_on', False))
         vbox.addWidget(self.tor_auto_on_cb)
 
         def use_tor_auto_on(b):
