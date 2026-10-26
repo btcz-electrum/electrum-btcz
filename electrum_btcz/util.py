@@ -567,19 +567,39 @@ def xor_bytes(a: bytes, b: bytes) -> bytes:
 
 
 def user_dir():
-    if "ZCASH_ELECTRUMDIR" in os.environ:
+    if "BTCZ_ELECTRUMDIR" in os.environ:
+        return os.environ["BTCZ_ELECTRUMDIR"]
+    elif "ZCASH_ELECTRUMDIR" in os.environ:
         return os.environ["ZCASH_ELECTRUMDIR"]
     elif 'ANDROID_DATA' in os.environ:
         return android_data_dir()
     elif os.name == 'posix':
         return os.path.join(os.environ["HOME"], ".electrum-btcz")
     elif "APPDATA" in os.environ:
-        return os.path.join(os.environ["APPDATA"], "Electrum-ZCASH")
+        return _windows_user_dir(os.environ["APPDATA"])
     elif "LOCALAPPDATA" in os.environ:
-        return os.path.join(os.environ["LOCALAPPDATA"], "Electrum-ZCASH")
+        return _windows_user_dir(os.environ["LOCALAPPDATA"])
     else:
         #raise Exception("No home directory found in environment variables.")
         return
+
+
+def _windows_user_dir(appdata):
+    """%APPDATA%\\Electrum-BTCZ. Older BTCZ wallets (3.x up to 4.1.2.3) used
+    Electrum-ZCASH: the first time Electrum-BTCZ is created, the wallet files
+    from there are copied over. Electrum-ZCASH itself is left as it was."""
+    path = os.path.join(appdata, "Electrum-BTCZ")
+    if os.path.exists(path):
+        return path
+    old_wallets = os.path.join(appdata, "Electrum-ZCASH", "wallets")
+    try:
+        os.makedirs(path)
+        if os.path.isdir(old_wallets):
+            import shutil
+            shutil.copytree(old_wallets, os.path.join(path, "wallets"))
+    except OSError:
+        pass
+    return path
 
 
 def resource_path(*parts):

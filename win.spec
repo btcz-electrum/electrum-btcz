@@ -1,5 +1,6 @@
 # -*- mode: python -*-
-# Windows build on GitHub Actions (.github/workflows/build.yml): one-file BTCZ-Electrum-<version>.exe
+# Windows build on GitHub Actions (.github/workflows/build.yml): one-file BTCZ-Electrum-<version>.exe,
+# or with BTCZ_WIN_ONEDIR=1 the folder dist/BTCZ-Electrum/ that the setup (contrib/github/btcz-electrum-setup.nsi) installs
 import os
 import os.path
 import sys
@@ -13,6 +14,8 @@ for i, x in enumerate(sys.argv):
         break
 else:
     cmdline_name = 'BTCZ-Electrum-%s' % os.environ.get('ZCASH_ELECTRUM_VERSION', '')
+
+ONEDIR = os.environ.get('BTCZ_WIN_ONEDIR') == '1'
 
 GITHUB_REF = os.environ.get('GITHUB_REF')
 ZCASH_ELECTRUM_VERSION = os.environ.get('ZCASH_ELECTRUM_VERSION')
@@ -145,14 +148,32 @@ for x in a.binaries.copy():
 
 pyz = PYZ(a.pure)
 
-# single portable .exe; wallets are kept in %APPDATA%\Electrum-BTCZ as usual
-exe = EXE(pyz,
-          a.scripts,
-          a.binaries,
-          a.datas,
-          debug=False,
-          strip=False,
-          upx=False,
-          console=False,
-          icon='electrum_btcz/gui/icons/electrum-btcz.ico',
-          name=os.path.join('dist', cmdline_name))
+if ONEDIR:
+    # installed version: the exe name stays the same across versions so shortcuts keep working
+    exe = EXE(pyz,
+              a.scripts,
+              exclude_binaries=True,
+              debug=False,
+              strip=False,
+              upx=False,
+              console=False,
+              icon='electrum_btcz/gui/icons/electrum-btcz.ico',
+              name='BTCZ-Electrum')
+    coll = COLLECT(exe,
+                   a.binaries,
+                   a.datas,
+                   strip=False,
+                   upx=False,
+                   name='BTCZ-Electrum')
+else:
+    # single portable .exe; wallets are kept in %APPDATA%\Electrum-BTCZ as usual
+    exe = EXE(pyz,
+              a.scripts,
+              a.binaries,
+              a.datas,
+              debug=False,
+              strip=False,
+              upx=False,
+              console=False,
+              icon='electrum_btcz/gui/icons/electrum-btcz.ico',
+              name=os.path.join('dist', cmdline_name))

@@ -1,7 +1,7 @@
 BitcoinZ Electrum - Lightweight BitcoinZ client
 =====================================
 
-**Version 4.1.2.2 (testing)** - port of Electrum-Zcash 4.1.2 to BitcoinZ.
+**Version 4.1.2.4 (testing)** - port of Electrum-Zcash 4.1.2 to BitcoinZ.
 
 - Signs transactions with the Canopy rules (active on BitcoinZ since block 1,735,000);
   the old 3.1.3 client can no longer send.
@@ -9,6 +9,12 @@ BitcoinZ Electrum - Lightweight BitcoinZ client
 - Builds: Windows ``.exe``, macOS ``.dmg`` (Apple Silicon and Intel) and source ``.tar.gz``
   are built by GitHub Actions (``.github/workflows/build.yml``) and attached to Releases.
 - Opening a 3.1.3 wallet upgrades the wallet file; back it up first.
+- Windows: ``BTCZ-Electrum-<version>-setup.exe`` installs to Program Files and first removes
+  any older installed BTCZ Electrum (also the 3.x one); ``BTCZ-Electrum-<version>.exe`` is the
+  portable single file. Neither the setup nor the uninstaller touches the wallets.
+- Windows wallets are in ``%APPDATA%\\Electrum-BTCZ`` (older versions used ``Electrum-ZCASH``).
+  When ``Electrum-BTCZ`` does not exist yet it is created and the wallet files from
+  ``Electrum-ZCASH\\wallets`` are copied into it; the old folder is left unchanged.
 
 Development fee
 ---------------

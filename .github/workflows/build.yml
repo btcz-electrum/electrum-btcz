@@ -55,6 +55,16 @@ jobs:
           mkdir -p electrum_btcz/locale
           pyinstaller --clean -y win.spec
           ls -la dist
+      # the setup installs the folder build and replaces any older installed version
+      - name: Build setup
+        shell: bash
+        run: |
+          BTCZ_WIN_ONEDIR=1 pyinstaller --clean -y win.spec
+          test -f dist/BTCZ-Electrum/BTCZ-Electrum.exe
+          MAKENSIS="/c/Program Files (x86)/NSIS/makensis.exe"
+          [ -x "$MAKENSIS" ] || choco install nsis -y --no-progress
+          "$MAKENSIS" -V3 -NOCD -DPRODUCT_VERSION="$ZCASH_ELECTRUM_VERSION" contrib/github/btcz-electrum-setup.nsi
+          ls -la dist
       - uses: actions/upload-artifact@v4
         with:
           name: windows
