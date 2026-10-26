@@ -2,12 +2,22 @@
 
 # python setup.py sdist --format=zip,gztar
 
-from setuptools import setup
 import os
 import sys
 import platform
-import imp
+import importlib.util
 import argparse
+import subprocess
+
+from setuptools import setup, find_packages
+from setuptools.command.install import install
+
+MIN_PYTHON_VERSION = "3.6.1"
+_min_python_version_tuple = tuple(map(int, (MIN_PYTHON_VERSION.split("."))))
+
+
+if sys.version_info[:3] < _min_python_version_tuple:
+    sys.exit("Error: BitcoinZ Electrum requires Python version >= %s..." % MIN_PYTHON_VERSION)
 
 with open('contrib/requirements/requirements.txt') as f:
     requirements = f.read().splitlines()
@@ -15,10 +25,10 @@ with open('contrib/requirements/requirements.txt') as f:
 with open('contrib/requirements/requirements-hw.txt') as f:
     requirements_hw = f.read().splitlines()
 
-version = imp.load_source('version', 'lib/version.py')
-
-if sys.version_info[:3] < (3, 4, 0):
-    sys.exit("Error: Electrum-BitcoinZ requires Python version >= 3.4.0...")
+# load version.py; needlessly complicated alternative to "imp.load_source":
+version_spec = importlib.util.spec_from_file_location('version', 'electrum_btcz/version.py')
+version_module = version = importlib.util.module_from_spec(version_spec)
+version_spec.loader.exec_module(version_module)
 
 data_files = []
 
@@ -37,54 +47,48 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
             usr_share = os.path.expanduser('~/.local/share')
     data_files += [
         (os.path.join(usr_share, 'applications/'), ['electrum-btcz.desktop']),
-        (os.path.join(usr_share, icons_dirname), ['icons/electrum-btcz.png'])
+        (os.path.join(usr_share, icons_dirname), ['electrum_btcz/gui/icons/electrum-btcz.png']),
     ]
 
+extras_require = {
+    'hardware': requirements_hw,
+    'gui': ['pyqt5'],
+    'crypto': ['cryptography>=2.6'],
+    'tests': ['pycryptodomex>=3.7', 'cryptography>=2.6', 'pyaes>=0.1a1'],
+}
+# 'full' extra that tries to grab everything an enduser would need (except for libsecp256k1...)
+extras_require['full'] = [pkg for sublist in
+                          (extras_require['hardware'], extras_require['gui'], extras_require['crypto'])
+                          for pkg in sublist]
+# legacy. keep 'fast' extra working
+extras_require['fast'] = extras_require['crypto']
+
+
 setup(
-    name="Electrum-BitcoinZ",
+    name="BTCZ-Electrum",
     version=version.ELECTRUM_VERSION,
+    python_requires='>={}'.format(MIN_PYTHON_VERSION),
     install_requires=requirements,
-    extras_require={
-        'full': requirements_hw + ['pycryptodomex'],
-    },
+    extras_require=extras_require,
     packages=[
-        'electrum_zcash',
-        'electrum_zcash_gui',
-        'electrum_zcash_gui.qt',
-        'electrum_zcash_plugins',
-        'electrum_zcash_plugins.audio_modem',
-        'electrum_zcash_plugins.cosigner_pool',
-        'electrum_zcash_plugins.email_requests',
-        'electrum_zcash_plugins.hw_wallet',
-        'electrum_zcash_plugins.keepkey',
-        'electrum_zcash_plugins.labels',
-        'electrum_zcash_plugins.ledger',
-        'electrum_zcash_plugins.trezor',
-        'electrum_zcash_plugins.digitalbitbox',
-        'electrum_zcash_plugins.virtualkeyboard',
-    ],
+        'electrum_btcz',
+        'electrum_btcz.gui',
+        'electrum_btcz.gui.qt',
+        'electrum_btcz.plugins',
+    ] + [('electrum_btcz.plugins.'+pkg) for pkg in find_packages('electrum_btcz/plugins')],
     package_dir={
-        'electrum_zcash': 'lib',
-        'electrum_zcash_gui': 'gui',
-        'electrum_zcash_plugins': 'plugins',
+        'electrum_btcz': 'electrum_btcz'
     },
-    package_data={
-        'electrum_zcash': [
-            'servers.json',
-            'checkpoints.json',
-            'servers_testnet.json',
-            'servers_regtest.json',
-            'currencies.json',
-            'wordlist/*.txt',
-            'locale/*/LC_MESSAGES/electrum.mo',
-        ]
-    },
-    scripts=['electrum-btcz'],
+    # Note: MANIFEST.in lists what gets included in the tar.gz, and the
+    # package_data kwarg lists what gets put in site-packages when pip installing the tar.gz.
+    # By specifying include_package_data=True, MANIFEST.in becomes responsible for both.
+    include_package_data=True,
+    scripts=['electrum_btcz/electrum-btcz'],
     data_files=data_files,
     description="Lightweight BitcoinZ Wallet",
-    author="Thomas Voegtlin & BitcoinZ dev team",
-    author_email="thomasv@electrum.org",
+    maintainer="zebra-lucky",
+    maintainer_email="zebra.lucky@gmail.com",
     license="MIT License",
-    url="https://github.com/btcz/electrum-btcz",
-    long_description="""Lightweight BitcoinZ Wallet"""
+    url="https://github.com/btcz-electrum/electrum-btcz",
+    long_description="""Lightweight BitcoinZ Wallet""",
 )

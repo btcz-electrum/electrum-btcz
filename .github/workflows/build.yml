@@ -1,0 +1,157 @@
+# Builds BTCZ Electrum for Windows (.exe), macOS (arm64 + Intel .dmg) and the source tarball.
+# Every push / manual run uploads the files as workflow artifacts; a pushed tag "v*" also creates a GitHub release.
+name: Build
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  workflow_dispatch:
+
+env:
+  SECP256K1_VERSION: v0.5.1
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        run: echo "version=$(python3 -c "exec(open('electrum_btcz/version.py').read()); print(ELECTRUM_VERSION)")" >> "$GITHUB_OUTPUT"
+
+  windows:
+    needs: version
+    runs-on: windows-latest
+    env:
+      ZCASH_ELECTRUM_VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          architecture: x64
+      - name: Build libsecp256k1
+        shell: bash
+        run: |
+          git clone -q --depth 1 --branch "$SECP256K1_VERSION" https://github.com/bitcoin-core/secp256k1.git secp
+          cmake -S secp -B secp/build -A x64 -DBUILD_SHARED_LIBS=ON \
+            -DSECP256K1_ENABLE_MODULE_RECOVERY=ON -DSECP256K1_ENABLE_MODULE_ECDH=ON \
+            -DSECP256K1_BUILD_TESTS=OFF -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=OFF \
+            -DSECP256K1_BUILD_BENCHMARK=OFF -DSECP256K1_BUILD_CTIME_TESTS=OFF -DSECP256K1_BUILD_EXAMPLES=OFF
+          cmake --build secp/build --config Release
+          find secp/build -name '*.dll'
+          cp "$(find secp/build -name '*.dll' | head -1)" electrum_btcz/libsecp256k1-0.dll
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --only-binary=cryptography -r contrib/github/requirements-ci.txt
+      - name: Check libsecp256k1 and checkpoints
+        run: python -c "import electrum_btcz.ecc_fast as e; assert e._libsecp256k1; from electrum_btcz import constants; print('checkpoints', len(constants.net.CHECKPOINTS))"
+      - name: Build exe
+        shell: bash
+        run: |
+          mkdir -p electrum_btcz/locale
+          pyinstaller --clean -y win.spec
+          ls -la dist
+      # the setup installs the folder build and replaces any older installed version
+      - name: Build setup
+        shell: bash
+        run: |
+          BTCZ_WIN_ONEDIR=1 pyinstaller --clean -y win.spec
+          test -f dist/BTCZ-Electrum/BTCZ-Electrum.exe
+          MAKENSIS="/c/Program Files (x86)/NSIS/makensis.exe"
+          [ -x "$MAKENSIS" ] || choco install nsis -y --no-progress
+          "$MAKENSIS" -V3 -NOCD -DPRODUCT_VERSION="$ZCASH_ELECTRUM_VERSION" contrib/github/btcz-electrum-setup.nsi
+          ls -la dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/BTCZ-Electrum-*.exe
+
+  macos:
+    needs: version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            arch: arm64
+          - runner: macos-15-intel
+            arch: intel
+    runs-on: ${{ matrix.runner }}
+    env:
+      ZCASH_ELECTRUM_VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build libsecp256k1
+        run: |
+          git clone -q --depth 1 --branch "$SECP256K1_VERSION" https://github.com/bitcoin-core/secp256k1.git secp
+          clang -O2 -mmacosx-version-min=11.0 -dynamiclib -install_name @rpath/libsecp256k1.0.dylib \
+            -Isecp/include -Isecp/src -DENABLE_MODULE_RECOVERY=1 -DENABLE_MODULE_ECDH=1 \
+            -DENABLE_MODULE_EXTRAKEYS=1 -DENABLE_MODULE_SCHNORRSIG=1 -DECMULT_WINDOW_SIZE=15 -DCOMB_BLOCKS=11 -DCOMB_TEETH=6 \
+            secp/src/secp256k1.c secp/src/precomputed_ecmult.c secp/src/precomputed_ecmult_gen.c \
+            -o electrum_btcz/libsecp256k1.0.dylib
+      # the system Python 3.9 is the same one the local macOS build uses
+      - name: Install dependencies
+        run: |
+          /usr/bin/python3 -m venv venv
+          venv/bin/pip install --upgrade pip
+          venv/bin/pip install --only-binary=cryptography -r contrib/github/requirements-ci.txt
+      - name: Check libsecp256k1 and checkpoints
+        run: venv/bin/python -c "import electrum_btcz.ecc_fast as e; assert e._libsecp256k1; from electrum_btcz import constants; print('checkpoints', len(constants.net.CHECKPOINTS))"
+      - name: Build dmg
+        run: |
+          mkdir -p electrum_btcz/locale
+          venv/bin/pyinstaller --clean -y osx.spec
+          "dist/BitcoinZ Electrum.app/Contents/MacOS/electrum-btcz-$ZCASH_ELECTRUM_VERSION.bin" --offline version
+          mkdir -p out
+          hdiutil create -quiet -fs HFS+ -volname "BitcoinZ Electrum" -srcfolder "dist/BitcoinZ Electrum.app" \
+            "out/BTCZ-Electrum-$ZCASH_ELECTRUM_VERSION-macos-${{ matrix.arch }}.dmg"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.arch }}
+          path: out/*.dmg
+
+  sdist:
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install setuptools wheel
+          python setup.py sdist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source
+          path: dist/*.tar.gz
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, macos, sdist]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: files
+          merge-multiple: true
+      - run: cd files && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: files/*
+          # releases in the main repo are the official ones; forks publish test pre-releases
+          prerelease: ${{ github.repository != 'btcz-electrum/electrum-btcz' }}
+          name: BitcoinZ Electrum ${{ github.ref_name }}
+          body: |
+            BitcoinZ Electrum ${{ github.ref_name }}. Install and upgrade guide (also for users of the old 3.1.3 wallet): https://github.com/${{ github.repository }}#download-and-install
+
+            - Windows: `BTCZ-Electrum-*-setup.exe` (installer, removes older versions) or the portable `BTCZ-Electrum-*.exe`
+            - macOS: `*-macos-arm64.dmg` (Apple Silicon) or `*-macos-intel.dmg`
+            - Linux / source: `btcz_electrum-*.tar.gz`
+            - Checksums: `SHA256SUMS.txt`

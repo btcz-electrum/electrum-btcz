@@ -1,0 +1,29 @@
+# Pinned build environment for .github/workflows/build.yml (same set as the local macOS build)
+aiohappyeyeballs==2.6.1
+aiohttp==3.13.5
+aiohttp_socks==0.12.0
+aiorpcX==0.18.7
+aiosignal==1.4.0
+async-timeout==5.0.1
+attrs==26.1.0
+bitarray==3.12.3
+bitstring==4.4.0
+certifi==2026.10.23
+cryptography==43.0.3
+dnspython==2.0.0
+frozenlist==1.8.0
+idna==3.20
+multidict==6.7.1
+propcache==0.4.1
+protobuf==3.20.3
+Pygments==2.21.0
+pyinstaller==6.11.1
+PyQt5==5.15.11
+PyQt5-Qt5==5.15.2; sys_platform == "win32"
+PyQt5-Qt5==5.15.19; sys_platform != "win32"
+PyQt5_sip==12.17.1
+python-socks==3.1.1
+qrcode==8.2
+tibs==0.5.7
+typing_extensions==4.16.0
+yarl==1.22.0

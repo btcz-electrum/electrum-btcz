@@ -1,0 +1,3 @@
+opt/venvs/electrum-btcz-venv/bin/electrum-btcz usr/bin/electrum-btcz
+opt/venvs/electrum-btcz-venv/share/pixmaps/electrum-btcz.png usr/share/pixmaps/electrum-btcz.png
+opt/venvs/electrum-btcz-venv/share/applications/electrum-btcz.desktop usr/share/applications/electrum-btcz.desktop
