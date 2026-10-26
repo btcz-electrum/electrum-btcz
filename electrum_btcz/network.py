@@ -295,7 +295,7 @@ class Network(Logger, NetworkRetryManager[ServerAddr]):
         self.daemon = daemon
 
         # Autodetect and enable Tor proxy on Network init
-        if self.config.get('tor_auto_on', True):
+        if self.config.get('tor_auto_on', False):
             tor_detected = self.detect_tor_proxy()
             if tor_detected:
                 self.config.set_key('proxy', tor_detected, False)
